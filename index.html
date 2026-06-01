@@ -1089,6 +1089,7 @@ function loadQuote(i) {
   document.getElementById('v2-dificultate-pereti').value = q.state.dificultatePereti || '1.0';
   document.getElementById('v2-acces').value = q.state.acces || '1.0';
   document.getElementById('v2-suprafata').value = q.state.suprafata || '0';
+  document.getElementById('v2-discount').value = q.state.discount || '0';
   
   if (q.state.qtys) {
     document.getElementById('v2-puncte').value = q.state.qtys["POINT_LIGHT_SIMPLE"] || 0;
