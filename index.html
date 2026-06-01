@@ -638,7 +638,12 @@
         <div id="led-total-vizual">0 lei</div>
       </div>
       
-      <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-top: 16px; margin-bottom: 24px; width:100%; height: 48px; font-size:16px;">🧮 Calculează Deviz</button>
+      <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-top: 16px; margin-bottom: 12px; width:100%; height: 48px; font-size:16px;">🧮 Calculează Deviz</button>
+      
+      <div style="border-top:1px solid var(--border); padding-top:16px; margin-bottom: 24px;">
+        <input type="text" id="v2-client-name" class="input" placeholder="Nume client / proiect (opțional)" style="margin-bottom:8px;">
+        <button class="btn btn-secondary" onclick="saveQuoteV2()" style="width:100%; height:44px; font-size:14px; border-color: var(--accent); color: var(--accent);">💾 Salvează Deviz</button>
+      </div>
     </div>
 
     <!-- REZULTAT V2 -->
@@ -647,11 +652,6 @@
       <div class="result-total" id="v2-total-general">0 lei</div>
       
       <div class="result-breakdown" id="v2-result-breakdown" style="margin-top: 12px; gap: 24px; display: flex;">
-      </div>
-
-      <div style="margin-top: 24px; border-top:1px solid var(--border); padding-top:16px;">
-        <input type="text" id="v2-client-name" class="input" placeholder="Nume client / proiect (opțional)" style="margin-bottom:8px;">
-        <button class="btn btn-primary" onclick="saveQuoteV2()" style="width:100%; height:44px; font-size:14px;">💾 Salvează Deviz</button>
       </div>
     </div>
     
@@ -1007,14 +1007,35 @@ function saveQuote() {
 }
 
 function saveQuoteV2() {
+  calculeazaV2();
+  
   const suprafata = document.getElementById('v2-suprafata').value;
-  const client = document.getElementById('v2-client-name').value || 'Deviz Dinamic';
+  const client = document.getElementById('v2-client-name').value || 'Deviz Nou';
   const tipEl = document.getElementById('v2-tip-lucrare');
   const tip = tipEl.options[tipEl.selectedIndex].text.split('(')[0].trim();
   const total = document.getElementById('v2-total-general').textContent;
   const date = new Date().toLocaleDateString('ro-RO');
 
-  savedQuotes.unshift({ client, tip, suprafata, total, date, id: Date.now() });
+  const state = {
+    tipLucrare: tipEl.value,
+    dificultatePereti: document.getElementById('v2-dificultate-pereti').value,
+    acces: document.getElementById('v2-acces').value,
+    suprafata: suprafata,
+    qtys: {
+      "POINT_LIGHT_SIMPLE": document.getElementById('v2-puncte').value,
+      "SOCKET_SINGLE": document.getElementById('v2-prize-simple').value,
+      "SOCKET_DOUBLE": document.getElementById('v2-prize-duble').value,
+      "SWITCH_SINGLE": document.getElementById('v2-intrerupatoare').value,
+      "CIRCUIT_DEDICATED": document.getElementById('v2-circuite').value,
+      "TABLOU_MAIN": document.getElementById('v2-tablouri').value
+    },
+    leds: Array.from(document.querySelectorAll('.led-row')).map(row => ({
+      tip: row.querySelector('.led-tip').value,
+      ml: row.querySelector('.led-ml').value
+    }))
+  };
+
+  savedQuotes.unshift({ client, tip, suprafata, total, date, id: Date.now(), state: state, isV2: true });
   localStorage.setItem('eleccalc_quotes', JSON.stringify(savedQuotes));
   showToast('💾 Deviz salvat!');
   renderQuotes();
@@ -1032,12 +1053,60 @@ function renderQuotes() {
         <div class="quote-name">${q.client}</div>
         <div class="quote-meta">${q.tip} · ${q.suprafata} mp · ${q.date}</div>
       </div>
-      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px">
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px">
         <div class="quote-total">${q.total}</div>
-        <button onclick="deleteQuote(${i})" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:0">✕ șterge</button>
+        <div style="display:flex; gap: 12px;">
+          <button onclick="loadQuote(${i})" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0;font-weight:bold;">📂 deschide</button>
+          <button onclick="deleteQuote(${i})" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:0">✕ șterge</button>
+        </div>
       </div>
     </div>
   `).join('');
+}
+
+function loadQuote(i) {
+  const q = savedQuotes[i];
+  if (!q.isV2 || !q.state) {
+    alert("Acest deviz este dintr-o versiune veche și nu poate fi deschis complet în noul calculator.");
+    return;
+  }
+  
+  document.getElementById('v2-tip-lucrare').value = q.state.tipLucrare || '1.0';
+  document.getElementById('v2-dificultate-pereti').value = q.state.dificultatePereti || '1.0';
+  document.getElementById('v2-acces').value = q.state.acces || '1.0';
+  document.getElementById('v2-suprafata').value = q.state.suprafata || '0';
+  
+  if (q.state.qtys) {
+    document.getElementById('v2-puncte').value = q.state.qtys["POINT_LIGHT_SIMPLE"] || 0;
+    document.getElementById('v2-prize-simple').value = q.state.qtys["SOCKET_SINGLE"] || 0;
+    document.getElementById('v2-prize-duble').value = q.state.qtys["SOCKET_DOUBLE"] || 0;
+    document.getElementById('v2-intrerupatoare').value = q.state.qtys["SWITCH_SINGLE"] || 0;
+    document.getElementById('v2-circuite').value = q.state.qtys["CIRCUIT_DEDICATED"] || 0;
+    document.getElementById('v2-tablouri').value = q.state.qtys["TABLOU_MAIN"] || 0;
+  }
+  
+  document.getElementById('led-rows-container').innerHTML = '';
+  ledRowCounter = 0;
+  
+  if (q.state.leds && q.state.leds.length > 0) {
+    q.state.leds.forEach(led => {
+      adaugaLinieLED();
+      const row = document.getElementById(`led-row-${ledRowCounter}`);
+      if (row) {
+        row.querySelector('.led-tip').value = led.tip;
+        row.querySelector('.led-ml').value = led.ml;
+      }
+    });
+  }
+  
+  updateLiniiLED();
+  
+  const clientNameEl = document.getElementById('v2-client-name');
+  if (clientNameEl) clientNameEl.value = (q.client === 'Deviz Nou' || q.client === 'Deviz Dinamic') ? '' : q.client;
+  
+  showTab('calculator');
+  calculeazaV2();
+  showToast('📂 Deviz încărcat cu succes!');
 }
 
 function deleteQuote(i) {
