@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ElecCalc — Calculator Instalații</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a23;
+    --surface2: #1e2330;
+    --border: #2a3044;
+    --accent: #f5a623;
+    --accent2: #ff6b35;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --text: #e8ecf4;
+    --text2: #8891a8;
+    --text3: #5a6278;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0d0f14 100%);
+    padding: 28px 20px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+  .version-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--text3);
+    font-weight: 300;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: var(--surface);
+    padding: 6px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .tab.active {
+    background: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
+
+  /* MAIN CONTENT */
+  .content { padding: 16px; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  /* FORM ELEMENTS */
+  .field { margin-bottom: 12px; }
+  .label {
+    display: block;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input:focus { border-color: var(--accent); }
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  select.input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238891a8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  /* STEPPER */
+  .stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .stepper-btn {
+    width: 44px; height: 44px;
+    background: var(--surface2);
+    border: none;
+    color: var(--accent);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .stepper-btn:active { background: var(--border); }
+  .stepper-val {
+    flex: 1;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* CHECKBOX ITEMS */
+  .check-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  .check-icon { font-size: 18px; }
+  .check-info { flex: 1; }
+  .check-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .check-price {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+  .check-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .check-qty {
+    width: 52px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    padding: 4px 6px;
+    outline: none;
+  }
+  .toggle {
+    width: 44px; height: 24px;
+    background: var(--border);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    border: none;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+  .toggle.on::after { transform: translateX(20px); }
+
+  /* RESULT PANEL */
+  .result-panel {
+    background: linear-gradient(135deg, var(--surface2) 0%, #1a2035 100%);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-panel::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(245,166,35,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .result-label {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .result-total {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .result-breakdown {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .result-item {
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .result-item span { color: var(--text); font-weight: 500; }
+
+  /* LINE ITEMS */
+  .line-items { margin-top: 8px; }
+  .line-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .line-item:last-child { border-bottom: none; }
+  .line-item-name { color: var(--text2); flex: 1; }
+  .line-item-qty { color: var(--text3); width: 50px; text-align: center; font-size: 12px; }
+  .line-item-price { color: var(--text); font-weight: 500; text-align: right; }
+
+  /* BUTTONS */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text2);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+  }
+  .btn-danger {
+    background: rgba(231,76,60,0.15);
+    color: var(--red);
+    border: 1px solid rgba(231,76,60,0.3);
+    margin-top: 8px;
+  }
+
+  /* PRICE EDITOR */
+  .price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .price-row:last-child { border-bottom: none; }
+  .price-row-name {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .price-row-unit {
+    font-size: 10px;
+    color: var(--text3);
+  }
+  .price-input {
+    width: 90px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: right;
+    padding: 6px 10px;
+    outline: none;
+  }
+  .price-input:focus { border-color: var(--accent); }
+
+  /* SAVED QUOTES */
+  .quote-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .quote-info { flex: 1; }
+  .quote-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .quote-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .quote-total { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent); }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-orange { background: rgba(245,166,35,0.15); color: var(--accent); }
+  .badge-green { background: rgba(46,204,113,0.15); color: var(--green); }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+  }
+
+  /* PROFIT INDICATOR */
+  .profit-bar {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .profit-label { font-size: 12px; color: var(--text2); }
+  .profit-value { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .profit-value.pos { color: var(--green); }
+  .profit-value.neg { color: var(--red); }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text3);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: #000;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* RANGE SLIDER */
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    height: 4px;
+    cursor: pointer;
+  }
+
+  .section-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .section-sub {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 16px;
+  }
+
+  /* PRINT STYLES */
+  @media print {
+    body { background: white; color: black; padding: 20px; min-height: auto; }
+    .header, .tabs, .btn, .toast, .section-header, .section-sub, .empty { display: none !important; }
+    
+    #tab-calculator > .card:nth-of-type(1),
+    #tab-calculator > .card:nth-of-type(2),
+    #tab-calculator > .card:nth-of-type(3),
+    #tab-calculator > .card:nth-of-type(4),
+    #tab-calculator > .card:nth-of-type(5) { display: none !important; }
+    
+    #printHeader { display: block !important; }
+
+    .result-panel, .card { 
+      background: transparent !important; 
+      border: 1px solid #ccc !important; 
+      color: black !important;
+      page-break-inside: avoid;
+      box-shadow: none !important;
+    }
+    .result-panel::before { display: none !important; }
+    .result-total, .result-item, .result-item span, .result-label, .profit-label, .profit-value { color: black !important; }
+    .line-item-name, .line-item-qty, .line-item-price { color: black !important; }
+    .card-title { color: black !important; }
+    .card-title .icon { background: transparent !important; border: 1px solid #ccc !important; }
+    .profit-bar { background: transparent !important; border: 1px solid #ccc !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">Elec<span>Calc</span></div>
+    <div class="version-badge">v1.0 · 2025</div>
+  </div>
+  <div class="header-sub">Calculator profesional instalații electrice</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('calculator')">🧮 Calculator</button>
+  <button class="tab" onclick="switchTab('devize')">📋 Devize</button>
+  <button class="tab" onclick="switchTab('preturi')">💰 Prețuri</button>
+  <button class="tab" onclick="switchTab('info')">ℹ️ Info</button>
+</div>
+
+<!-- ========== CALCULATOR ========== -->
+<div class="content">
+<div id="tab-calculator" class="section active">
+
+  <div class="section-header">Deviz nou</div>
+  <div class="section-sub">Completează parametrii lucrării</div>
+
+  <!-- TIP LUCRARE -->
+  <div class="card">
+    <div class="card-title"><div class="icon">🏗️</div> Tip lucrare</div>
+    <div class="field">
+      <label class="label">Client / Adresă (opțional)</label>
+      <input class="input" type="text" id="clientName" placeholder="ex: Ion Popescu, Str. Castanilor 5">
+    </div>
+    <div class="field">
+      <label class="label">Tip lucrare</label>
+      <select class="input" id="tipLucrare" onchange="updateUI()">
+        <option value="instalatie_noua">Instalație completă nouă (la roșu)</option>
+        <option value="renovare">Renovare / Înlocuire instalație</option>
+        <option value="extindere">Extindere instalație existentă</option>
+        <option value="interventie">Intervenție / Reparație</option>
+      </select>
+    </div>
+    <div class="input-row">
+      <div class="field">
+        <label class="label">Tip clădire</label>
+        <select class="input" id="tipCladire" onchange="updateUI()">
+          <option value="apartament">Apartament</option>
+          <option value="casa">Casă</option>
+          <option value="spatiu_comercial">Spațiu comercial</option>
+          <option value="birou">Birou</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">Suprafață (mp)</label>
+        <input class="input" type="number" id="suprafata" value="60" min="1" oninput="calcAll()">
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">Nr. camere: <span id="camereVal">3</span></label>
+      <input type="range" id="camere" min="1" max="10" value="3" oninput="document.getElementById('camereVal').textContent=this.value; calcAll()">
+    </div>
+  </div>
+
+  <!-- INSTALATIE COMPLETA -->
+  <div class="card" id="card-instalatie">
+    <div class="card-title"><div class="icon">⚡</div> Instalație de bază</div>
+
+    <div class="check-item" onclick="toggleCheck('tablou')">
+      <div class="check-left">
+        <div class="check-icon">🔲</div>
+        <div class="check-info">
+          <div class="check-name">Tablou electric nou</div>
+          <div class="check-price" id="price-tablou-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-tablou" value="1" min="1" max="5" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle on" id="tog-tablou"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('cablare-mp')">
+      <div class="check-left">
+        <div class="check-icon">〰️</div>
+        <div class="check-info">
+          <div class="check-name">Cablare pe mp (inclus circuite)</div>
+          <div class="check-price" id="price-cablare-mp-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle on" id="tog-cablare-mp"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('prize')">
+      <div class="check-left">
+        <div class="check-icon">🔌</div>
+        <div class="check-info">
+          <div class="check-name">Prize simple</div>
+          <div class="check-price" id="price-prize-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-prize" value="10" min="1" max="100" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle on" id="tog-prize"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('prize-duble')">
+      <div class="check-left">
+        <div class="check-icon">🔌</div>
+        <div class="check-info">
+          <div class="check-name">Prize duble</div>
+          <div class="check-price" id="price-prize-duble-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-prize-duble" value="4" min="0" max="50" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-prize-duble"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('intrerupatoare')">
+      <div class="check-left">
+        <div class="check-icon">💡</div>
+        <div class="check-info">
+          <div class="check-name">Întrerupătoare</div>
+          <div class="check-price" id="price-intrerupatoare-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-intrerupatoare" value="6" min="1" max="50" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle on" id="tog-intrerupatoare"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('comutatoare')">
+      <div class="check-left">
+        <div class="check-icon">🔄</div>
+        <div class="check-info">
+          <div class="check-name">Comutatoare (cap-scară)</div>
+          <div class="check-price" id="price-comutatoare-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-comutatoare" value="2" min="0" max="20" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-comutatoare"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('corpuri-iluminat')">
+      <div class="check-left">
+        <div class="check-icon">🔦</div>
+        <div class="check-info">
+          <div class="check-name">Corp iluminat / lustră</div>
+          <div class="check-price" id="price-corpuri-iluminat-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-corpuri-iluminat" value="5" min="0" max="50" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle on" id="tog-corpuri-iluminat"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('spotturi')">
+      <div class="check-left">
+        <div class="check-icon">🔆</div>
+        <div class="check-info">
+          <div class="check-name">Spoturi încastrate</div>
+          <div class="check-price" id="price-spotturi-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-spotturi" value="0" min="0" max="100" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-spotturi"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CIRCUITE DEDICATE -->
+  <div class="card">
+    <div class="card-title"><div class="icon">🔧</div> Circuite dedicate</div>
+
+    <div class="check-item" onclick="toggleCheck('plita')">
+      <div class="check-left">
+        <div class="check-icon">🍳</div>
+        <div class="check-info">
+          <div class="check-name">Circuit plită electrică / inducție</div>
+          <div class="check-price" id="price-plita-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-plita" value="1" min="1" max="3" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-plita"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('cuptor')">
+      <div class="check-left">
+        <div class="check-icon">🔥</div>
+        <div class="check-info">
+          <div class="check-name">Circuit cuptor electric</div>
+          <div class="check-price" id="price-cuptor-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-cuptor" value="1" min="1" max="2" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-cuptor"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('boiler')">
+      <div class="check-left">
+        <div class="check-icon">🚿</div>
+        <div class="check-info">
+          <div class="check-name">Circuit boiler electric</div>
+          <div class="check-price" id="price-boiler-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-boiler" value="1" min="1" max="3" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-boiler"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('masina-spalat')">
+      <div class="check-left">
+        <div class="check-icon">🫧</div>
+        <div class="check-info">
+          <div class="check-name">Circuit mașină de spălat</div>
+          <div class="check-price" id="price-masina-spalat-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-masina-spalat" value="1" min="1" max="3" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-masina-spalat"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('aer-conditionat')">
+      <div class="check-left">
+        <div class="check-icon">❄️</div>
+        <div class="check-info">
+          <div class="check-name">Circuit aer condiționat</div>
+          <div class="check-price" id="price-aer-conditionat-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-aer-conditionat" value="1" min="1" max="5" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-aer-conditionat"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('pompa-caldura')">
+      <div class="check-left">
+        <div class="check-icon">🌡️</div>
+        <div class="check-info">
+          <div class="check-name">Circuit pompă de căldură</div>
+          <div class="check-price" id="price-pompa-caldura-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-pompa-caldura" value="1" min="1" max="2" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-pompa-caldura"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('incarcator-ev')">
+      <div class="check-left">
+        <div class="check-icon">🚗</div>
+        <div class="check-info">
+          <div class="check-name">Stație încărcare EV (wallbox)</div>
+          <div class="check-price" id="price-incarcator-ev-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-incarcator-ev" value="1" min="1" max="2" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-incarcator-ev"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICII SUPLIMENTARE -->
+  <div class="card">
+    <div class="card-title"><div class="icon">🛡️</div> Servicii & verificări</div>
+
+    <div class="check-item" onclick="toggleCheck('impamantare')">
+      <div class="check-left">
+        <div class="check-icon">🌍</div>
+        <div class="check-info">
+          <div class="check-name">Priză de pământ (împământare)</div>
+          <div class="check-price" id="price-impamantare-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle off" id="tog-impamantare"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('verificare-pram')">
+      <div class="check-left">
+        <div class="check-icon">📋</div>
+        <div class="check-info">
+          <div class="check-name">Verificare PRAM + buletin</div>
+          <div class="check-price" id="price-verificare-pram-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle off" id="tog-verificare-pram"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('proiect')">
+      <div class="check-left">
+        <div class="check-icon">📐</div>
+        <div class="check-info">
+          <div class="check-name">Proiect electric (schemă)</div>
+          <div class="check-price" id="price-proiect-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle off" id="tog-proiect"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('paratrasnet')">
+      <div class="check-left">
+        <div class="check-icon">⛈️</div>
+        <div class="check-info">
+          <div class="check-name">Paratrăsnet</div>
+          <div class="check-price" id="price-paratrasnet-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle off" id="tog-paratrasnet"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('videointerfon')">
+      <div class="check-left">
+        <div class="check-icon">🔔</div>
+        <div class="check-info">
+          <div class="check-name">Videointerfon / sonerie</div>
+          <div class="check-price" id="price-videointerfon-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle off" id="tog-videointerfon"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('alarma')">
+      <div class="check-left">
+        <div class="check-icon">🚨</div>
+        <div class="check-info">
+          <div class="check-name">Sistem alarmă (cablaj)</div>
+          <div class="check-price" id="price-alarma-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle off" id="tog-alarma"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('camera')">
+      <div class="check-left">
+        <div class="check-icon">📷</div>
+        <div class="check-info">
+          <div class="check-name">Cameră supraveghere (cablaj/montaj)</div>
+          <div class="check-price" id="price-camera-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-camera" value="2" min="1" max="20" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-camera"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('retea-date')">
+      <div class="check-left">
+        <div class="check-icon">🌐</div>
+        <div class="check-info">
+          <div class="check-name">Rețea date / cablaj internet</div>
+          <div class="check-price" id="price-retea-date-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <input class="check-qty" type="number" id="qty-retea-date" value="3" min="1" max="20" onclick="event.stopPropagation()" oninput="calcAll()">
+        <button class="toggle off" id="tog-retea-date"></button>
+      </div>
+    </div>
+
+    <div class="check-item" onclick="toggleCheck('deplasare')">
+      <div class="check-left">
+        <div class="check-icon">🚐</div>
+        <div class="check-info">
+          <div class="check-name">Deplasare / transport</div>
+          <div class="check-price" id="price-deplasare-label"></div>
+        </div>
+      </div>
+      <div class="check-right">
+        <button class="toggle off" id="tog-deplasare"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAJORĂRI -->
+  <div class="card">
+    <div class="card-title"><div class="icon">📊</div> Ajustări preț</div>
+
+    <div class="field">
+      <label class="label">Dificultate lucrare</label>
+      <select class="input" id="dificultate" onchange="calcAll()">
+        <option value="1">Standard</option>
+        <option value="1.2">Dificil (+20%) — beton, acces greu</option>
+        <option value="1.4">Foarte dificil (+40%) — condiții speciale</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label">Urgență</label>
+      <select class="input" id="urgenta" onchange="calcAll()">
+        <option value="1">Normal</option>
+        <option value="1.25">Urgent (+25%)</option>
+        <option value="1.5">Foarte urgent (+50%)</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label">Reducere client (%)</label>
+      <input class="input" type="number" id="reducere" value="0" min="0" max="30" oninput="calcAll()">
+    </div>
+
+    <div class="field">
+      <label class="label">Materiale estimate (lei) — opțional</label>
+      <input class="input" type="number" id="materiale" value="0" min="0" placeholder="0 = doar manoperă" oninput="calcAll()">
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-panel" id="resultPanel">
+    <div class="result-label">TOTAL ESTIMAT MANOPERĂ</div>
+    <div class="result-total" id="totalDisplay">0 lei</div>
+    <div class="result-breakdown">
+      <div class="result-item">Manoperă: <span id="manoperaDisplay">0 lei</span></div>
+      <div class="result-item">Materiale: <span id="materialeDisplay">0 lei</span></div>
+    </div>
+    <div class="profit-bar" id="totalCuMateriale" style="display:none">
+      <div class="profit-label">Total cu materiale</div>
+      <div class="profit-value pos" id="totalCuMaterialeVal">0 lei</div>
+    </div>
+  </div>
+
+  <!-- DETALII -->
+  <div class="card">
+    <div class="card-title"><div class="icon">📄</div> Detalii deviz</div>
+    <div class="line-items" id="lineItems">
+      <div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Selectează serviciile de mai sus</div></div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" onclick="saveQuote()">💾 Salvează deviz (Local)</button>
+  <button class="btn btn-secondary" onclick="exportPDF()">🖨️ Exportă deviz (PDF)</button>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+    <button class="btn btn-secondary" style="margin-top: 0;" onclick="exportJSON()">⬇️ Descarcă (.json)</button>
+    <label class="btn btn-secondary" style="margin-top: 0; display:flex; align-items:center; justify-content:center; cursor:pointer; text-align:center;">
+      ⬆️ Încarcă (.json)
+      <input type="file" id="importJson" accept=".json" style="display:none" onchange="importJSON(event)">
+    </label>
+  </div>
+  <button class="btn btn-danger" onclick="resetCalc()">🔄 Deviz nou / Resetează</button>
+</div>
+
+<!-- ========== DEVIZE SALVATE ========== -->
+<div id="tab-devize" class="section">
+  <div class="section-header">Devize salvate</div>
+  <div class="section-sub">Istoricul calculelor tale</div>
+  <div id="quotesList">
+    <div class="empty"><div class="empty-icon">📂</div><div class="empty-text">Niciun deviz salvat încă</div></div>
+  </div>
+</div>
+
+<!-- ========== EDITOR PRETURI ========== -->
+<div id="tab-preturi" class="section">
+  <div class="section-header">Editor prețuri</div>
+  <div class="section-sub">Modifică tarifele după zona ta</div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">⚡</div> Instalație de bază</div>
+    <div id="price-editor-base"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon">🔧</div> Circuite dedicate</div>
+    <div id="price-editor-circuite"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon">🛡️</div> Servicii & verificări</div>
+    <div id="price-editor-servicii"></div>
+  </div>
+
+  <button class="btn btn-primary" onclick="savePrices()">✅ Salvează prețuri</button>
+  <button class="btn btn-danger" onclick="resetPrices()">↩️ Resetează la default</button>
+</div>
+
+<!-- ========== INFO ========== -->
+<div id="tab-info" class="section">
+  <div class="section-header">Despre ElecCalc</div>
+  <div class="section-sub">Referințe de preț pentru zona Moldova</div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">📍</div> Context regional</div>
+    <p style="font-size:13px; color:var(--text2); line-height:1.7">
+      Prețurile implicite sunt calibrate pentru zona <strong style="color:var(--text)">Moldova (Vaslui, Iași, Bacău)</strong>, unde tarifele sunt cu ~25-35% mai mici față de București.<br><br>
+      Dacă lucrezi și în alte zone, poți ajusta prețurile din tab-ul <strong style="color:var(--accent)">Prețuri</strong>.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">💡</div> Referințe piață 2025</div>
+    <div class="line-items">
+      <div class="line-item">
+        <div class="line-item-name">Instalație completă (manoperă)</div>
+        <div class="line-item-price">120–180 lei/mp</div>
+      </div>
+      <div class="line-item">
+        <div class="line-item-name">Electrician autorizat (orar)</div>
+        <div class="line-item-price">80–120 lei/h</div>
+      </div>
+      <div class="line-item">
+        <div class="line-item-name">Traseu cablu 3×1.5mm</div>
+        <div class="line-item-price">25–45 lei/ml</div>
+      </div>
+      <div class="line-item">
+        <div class="line-item-name">Traseu cablu 3×2.5mm</div>
+        <div class="line-item-price">30–50 lei/ml</div>
+      </div>
+      <div class="line-item">
+        <div class="line-item-name">Verificare PRAM completă</div>
+        <div class="line-item-price">700–1.200 lei</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon">⚠️</div> Important</div>
+    <p style="font-size:13px; color:var(--text2); line-height:1.7">
+      Prețurile din aplicație sunt <strong style="color:var(--accent)">orientative</strong> și reprezintă doar manopera, fără materiale.<br><br>
+      Ajustează-le din <strong style="color:var(--accent)">tab-ul Prețuri</strong> în funcție de situația concretă și feedback-ul pieței locale.
+    </p>
+  </div>
+</div>
+
+</div><!-- end content -->
+
+<div class="toast" id="toast">✓ Salvat cu succes!</div>
+
+<script>
+// ====== PRICES DATA ======
+const DEFAULT_PRICES = {
+  // base
+  'tablou': { name: 'Tablou electric nou', unit: 'buc', price: 450, hasQty: true },
+  'cablare-mp': { name: 'Cablare pe mp (trasee + circuite)', unit: 'mp', price: 140, hasQty: false },
+  'prize': { name: 'Priză simplă', unit: 'buc', price: 50, hasQty: true },
+  'prize-duble': { name: 'Priză dublă', unit: 'buc', price: 70, hasQty: true },
+  'intrerupatoare': { name: 'Întrerupător simplu', unit: 'buc', price: 50, hasQty: true },
+  'comutatoare': { name: 'Comutator (cap-scară)', unit: 'buc', price: 65, hasQty: true },
+  'corpuri-iluminat': { name: 'Corp iluminat / lustră', unit: 'buc', price: 75, hasQty: true },
+  'spotturi': { name: 'Spot încastrat', unit: 'buc', price: 40, hasQty: true },
+  // circuite
+  'plita': { name: 'Circuit plită electrică / inducție', unit: 'buc', price: 200, hasQty: true },
+  'cuptor': { name: 'Circuit cuptor electric', unit: 'buc', price: 170, hasQty: true },
+  'boiler': { name: 'Circuit boiler electric', unit: 'buc', price: 180, hasQty: true },
+  'masina-spalat': { name: 'Circuit mașină de spălat', unit: 'buc', price: 150, hasQty: true },
+  'aer-conditionat': { name: 'Circuit aer condiționat', unit: 'buc', price: 180, hasQty: true },
+  'pompa-caldura': { name: 'Circuit pompă de căldură', unit: 'buc', price: 350, hasQty: true },
+  'incarcator-ev': { name: 'Stație încărcare EV (wallbox)', unit: 'buc', price: 500, hasQty: true },
+  // servicii
+  'impamantare': { name: 'Priză de pământ (împământare)', unit: 'set', price: 600, hasQty: false },
+  'verificare-pram': { name: 'Verificare PRAM + buletin', unit: 'set', price: 750, hasQty: false },
+  'proiect': { name: 'Proiect electric (schemă)', unit: 'set', price: 400, hasQty: false },
+  'paratrasnet': { name: 'Paratrăsnet (montaj)', unit: 'set', price: 800, hasQty: false },
+  'videointerfon': { name: 'Videointerfon / sonerie', unit: 'set', price: 200, hasQty: false },
+  'alarma': { name: 'Sistem alarmă (cablaj)', unit: 'set', price: 450, hasQty: false },
+  'camera': { name: 'Cameră supraveghere (cablaj+montaj)', unit: 'buc', price: 100, hasQty: true },
+  'retea-date': { name: 'Punct rețea date / internet', unit: 'buc', price: 80, hasQty: true },
+  'deplasare': { name: 'Deplasare / transport', unit: 'set', price: 100, hasQty: false },
+};
+
+const PRICE_GROUPS = {
+  base: ['tablou','cablare-mp','prize','prize-duble','intrerupatoare','comutatoare','corpuri-iluminat','spotturi'],
+  circuite: ['plita','cuptor','boiler','masina-spalat','aer-conditionat','pompa-caldura','incarcator-ev'],
+  servicii: ['impamantare','verificare-pram','proiect','paratrasnet','videointerfon','alarma','camera','retea-date','deplasare']
+};
+
+let prices = {};
+let toggleState = {};
+let savedQuotes = [];
+
+// ====== INIT ======
+function init() {
+  const saved = localStorage.getItem('eleccalc_prices');
+  prices = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_PRICES));
+
+  const savedQ = localStorage.getItem('eleccalc_quotes');
+  savedQuotes = savedQ ? JSON.parse(savedQ) : [];
+
+  // init toggle states
+  Object.keys(DEFAULT_PRICES).forEach(k => {
+    const el = document.getElementById('tog-' + k);
+    if (el) toggleState[k] = el.classList.contains('on');
+  });
+
+  buildPriceEditor();
+  updatePriceLabels();
+  calcAll();
+  renderQuotes();
+}
+
+// ====== TABS ======
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const tabs = ['calculator','devize','preturi','info'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'devize') renderQuotes();
+}
+
+// ====== TOGGLE ======
+function toggleCheck(key) {
+  const btn = document.getElementById('tog-' + key);
+  if (!btn) return;
+  const isOn = btn.classList.contains('on');
+  btn.classList.toggle('on', !isOn);
+  btn.classList.toggle('off', isOn);
+  toggleState[key] = !isOn;
+  calcAll();
+}
+
+// ====== CALC ======
+function calcAll() {
+  const suprafata = parseFloat(document.getElementById('suprafata').value) || 0;
+  const dificultate = parseFloat(document.getElementById('dificultate').value);
+  const urgenta = parseFloat(document.getElementById('urgenta').value);
+  const reducere = parseFloat(document.getElementById('reducere').value) || 0;
+  const materialeExtra = parseFloat(document.getElementById('materiale').value) || 0;
+
+  let total = 0;
+  const items = [];
+
+  Object.keys(toggleState).forEach(key => {
+    if (!toggleState[key]) return;
+    const p = prices[key];
+    if (!p) return;
+
+    let qty = 1;
+    if (p.hasQty) {
+      const qtyEl = document.getElementById('qty-' + key);
+      qty = qtyEl ? (parseFloat(qtyEl.value) || 1) : 1;
+    }
+
+    let unitPrice = p.price;
+    if (key === 'cablare-mp') {
+      unitPrice = p.price;
+      qty = suprafata;
+    }
+
+    const lineTotal = unitPrice * qty;
+    total += lineTotal;
+    items.push({ name: p.name, qty: key === 'cablare-mp' ? suprafata + ' mp' : (p.hasQty ? qty + ' ' + p.unit : p.unit), price: lineTotal });
+  });
+
+  // Apply multipliers
+  total = total * dificultate * urgenta;
+  // Reducere
+  total = total * (1 - reducere / 100);
+
+  total = Math.round(total);
+  const totalCuMat = total + materialeExtra;
+
+  document.getElementById('totalDisplay').textContent = fmt(total) + ' lei';
+  document.getElementById('manoperaDisplay').textContent = fmt(total) + ' lei';
+  document.getElementById('materialeDisplay').textContent = fmt(materialeExtra) + ' lei';
+
+  const cmPanel = document.getElementById('totalCuMateriale');
+  if (materialeExtra > 0) {
+    cmPanel.style.display = 'flex';
+    document.getElementById('totalCuMaterialeVal').textContent = fmt(totalCuMat) + ' lei';
+  } else {
+    cmPanel.style.display = 'none';
+  }
+
+  // Line items
+  const li = document.getElementById('lineItems');
+  if (items.length === 0) {
+    li.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Selectează serviciile de mai sus</div></div>';
+  } else {
+    li.innerHTML = items.map(i => `
+      <div class="line-item">
+        <div class="line-item-name">${i.name}</div>
+        <div class="line-item-qty">${i.qty}</div>
+        <div class="line-item-price">${fmt(i.price)} lei</div>
+      </div>
+    `).join('') + `
+      <div class="line-item" style="border-top: 1px solid var(--accent); margin-top:4px; padding-top:10px">
+        <div class="line-item-name" style="font-weight:600; color:var(--text)">TOTAL MANOPERĂ</div>
+        <div class="line-item-qty"></div>
+        <div class="line-item-price" style="color:var(--accent); font-family:Syne,sans-serif; font-size:15px">${fmt(total)} lei</div>
+      </div>
+    `;
+  }
+
+  updatePriceLabels();
+}
+
+function fmt(n) {
+  return n.toLocaleString('ro-RO');
+}
+
+// ====== PRICE LABELS ======
+function updatePriceLabels() {
+  Object.keys(DEFAULT_PRICES).forEach(key => {
+    const el = document.getElementById('price-' + key + '-label');
+    if (!el) return;
+    const p = prices[key];
+    if (key === 'cablare-mp') {
+      el.textContent = p.price + ' lei/mp × suprafață';
+    } else if (p.hasQty) {
+      el.textContent = p.price + ' lei/' + p.unit;
+    } else {
+      el.textContent = p.price + ' lei';
+    }
+  });
+}
+
+// ====== SAVE QUOTE ======
+function saveQuote() {
+  const suprafata = document.getElementById('suprafata').value;
+  const client = document.getElementById('clientName').value || 'Fără nume';
+  const tip = document.getElementById('tipLucrare').options[document.getElementById('tipLucrare').selectedIndex].text;
+  const total = document.getElementById('totalDisplay').textContent;
+  const date = new Date().toLocaleDateString('ro-RO');
+
+  savedQuotes.unshift({ client, tip, suprafata, total, date, id: Date.now() });
+  localStorage.setItem('eleccalc_quotes', JSON.stringify(savedQuotes));
+  showToast('💾 Deviz salvat!');
+  renderQuotes();
+}
+
+function renderQuotes() {
+  const el = document.getElementById('quotesList');
+  if (savedQuotes.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><div class="empty-text">Niciun deviz salvat încă</div></div>';
+    return;
+  }
+  el.innerHTML = savedQuotes.map((q, i) => `
+    <div class="quote-card">
+      <div class="quote-info">
+        <div class="quote-name">${q.client}</div>
+        <div class="quote-meta">${q.tip} · ${q.suprafata} mp · ${q.date}</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px">
+        <div class="quote-total">${q.total}</div>
+        <button onclick="deleteQuote(${i})" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:0">✕ șterge</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteQuote(i) {
+  savedQuotes.splice(i, 1);
+  localStorage.setItem('eleccalc_quotes', JSON.stringify(savedQuotes));
+  renderQuotes();
+  showToast('🗑️ Deviz șters');
+}
+
+// ====== PRICE EDITOR ======
+function buildPriceEditor() {
+  Object.entries(PRICE_GROUPS).forEach(([group, keys]) => {
+    const el = document.getElementById('price-editor-' + group);
+    if (!el) return;
+    el.innerHTML = keys.map(key => {
+      const p = prices[key];
+      return `
+        <div class="price-row">
+          <div class="price-row-name">${p.name}<br><span class="price-row-unit">per ${p.unit}</span></div>
+          <input class="price-input" type="number" id="pe-${key}" value="${p.price}" min="0" oninput="updatePrice('${key}', this.value)">
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+function updatePrice(key, val) {
+  prices[key].price = parseFloat(val) || 0;
+  updatePriceLabels();
+  calcAll();
+}
+
+function savePrices() {
+  localStorage.setItem('eleccalc_prices', JSON.stringify(prices));
+  showToast('✅ Prețuri salvate!');
+}
+
+function resetPrices() {
+  if (!confirm('Resetezi toate prețurile la valorile implicite?')) return;
+  prices = JSON.parse(JSON.stringify(DEFAULT_PRICES));
+  localStorage.removeItem('eleccalc_prices');
+  buildPriceEditor();
+  updatePriceLabels();
+  calcAll();
+  showToast('↩️ Prețuri resetate');
+}
+
+// ====== RESET CALC ======
+function resetCalc() {
+  document.getElementById('clientName').value = '';
+  document.getElementById('suprafata').value = '60';
+  document.getElementById('camere').value = '3';
+  document.getElementById('camereVal').textContent = '3';
+  document.getElementById('reducere').value = '0';
+  document.getElementById('materiale').value = '0';
+  document.getElementById('dificultate').value = '1';
+  document.getElementById('urgenta').value = '1';
+
+  // reset toggles
+  Object.keys(DEFAULT_PRICES).forEach(key => {
+    const btn = document.getElementById('tog-' + key);
+    if (!btn) return;
+    const defaults = ['tablou','cablare-mp','prize','intrerupatoare','corpuri-iluminat'];
+    const on = defaults.includes(key);
+    btn.classList.toggle('on', on);
+    btn.classList.toggle('off', !on);
+    toggleState[key] = on;
+  });
+
+  calcAll();
+  showToast('🔄 Deviz resetat');
+}
+
+// ====== TOAST ======
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function updateUI() { calcAll(); }
+
+// ====== EXPORT / IMPORT ======
+function exportPDF() {
+  let printHeader = document.getElementById('printHeader');
+  if (!printHeader) {
+    printHeader = document.createElement('div');
+    printHeader.id = 'printHeader';
+    printHeader.style.display = 'none';
+    document.getElementById('resultPanel').parentNode.insertBefore(printHeader, document.getElementById('resultPanel'));
+  }
+  
+  const clientName = document.getElementById('clientName').value || 'Nespecificat';
+  const tip = document.getElementById('tipLucrare').options[document.getElementById('tipLucrare').selectedIndex].text;
+  const suprafata = document.getElementById('suprafata').value;
+  const dateStr = new Date().toLocaleDateString('ro-RO');
+
+  printHeader.innerHTML = `
+    <h2 style="margin-bottom:10px; font-family:Syne, sans-serif;">Deviz Instalații Electrice</h2>
+    <p><strong>Client / Adresă:</strong> ${clientName}</p>
+    <p><strong>Tip lucrare:</strong> ${tip}</p>
+    <p><strong>Suprafață:</strong> ${suprafata} mp</p>
+    <p><strong>Data:</strong> ${dateStr}</p>
+    <hr style="margin: 15px 0; border: none; border-top: 1px solid #ccc;">
+  `;
+
+  window.print();
+}
+
+function exportJSON() {
+  const clientName = document.getElementById('clientName').value || 'Deviz';
+  
+  const data = {
+    clientName: document.getElementById('clientName').value,
+    tipLucrare: document.getElementById('tipLucrare').value,
+    tipCladire: document.getElementById('tipCladire').value,
+    suprafata: document.getElementById('suprafata').value,
+    camere: document.getElementById('camere').value,
+    dificultate: document.getElementById('dificultate').value,
+    urgenta: document.getElementById('urgenta').value,
+    reducere: document.getElementById('reducere').value,
+    materiale: document.getElementById('materiale').value,
+    toggleState: toggleState,
+    qty: {}
+  };
+
+  Object.keys(toggleState).forEach(key => {
+    const qtyEl = document.getElementById('qty-' + key);
+    if (qtyEl) data.qty[key] = qtyEl.value;
+  });
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  
+  const dateStr = new Date().toISOString().split('T')[0];
+  const safeName = clientName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  dlAnchorElem.setAttribute("download", `deviz_${safeName}_${dateStr}.json`);
+  document.body.appendChild(dlAnchorElem);
+  dlAnchorElem.click();
+  dlAnchorElem.remove();
+  showToast('⬇️ Fișier JSON descărcat');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      
+      if(data.clientName !== undefined) document.getElementById('clientName').value = data.clientName;
+      if(data.tipLucrare) document.getElementById('tipLucrare').value = data.tipLucrare;
+      if(data.tipCladire) document.getElementById('tipCladire').value = data.tipCladire;
+      if(data.suprafata) document.getElementById('suprafata').value = data.suprafata;
+      if(data.camere) {
+        document.getElementById('camere').value = data.camere;
+        document.getElementById('camereVal').textContent = data.camere;
+      }
+      if(data.dificultate) document.getElementById('dificultate').value = data.dificultate;
+      if(data.urgenta) document.getElementById('urgenta').value = data.urgenta;
+      if(data.reducere !== undefined) document.getElementById('reducere').value = data.reducere;
+      if(data.materiale !== undefined) document.getElementById('materiale').value = data.materiale;
+      
+      if(data.toggleState) {
+        Object.keys(data.toggleState).forEach(key => {
+          toggleState[key] = data.toggleState[key];
+          const btn = document.getElementById('tog-' + key);
+          if (btn) {
+            btn.classList.toggle('on', toggleState[key]);
+            btn.classList.toggle('off', !toggleState[key]);
+          }
+        });
+      }
+
+      if(data.qty) {
+        Object.keys(data.qty).forEach(key => {
+          const qtyEl = document.getElementById('qty-' + key);
+          if (qtyEl) qtyEl.value = data.qty[key];
+        });
+      }
+
+      calcAll();
+      showToast('⬆️ Deviz încărcat cu succes!');
+    } catch (err) {
+      alert('Eroare la citirea fișierului JSON!');
+    }
+  };
+  reader.readAsText(file);
+  
+  event.target.value = '';
+}
+
+// ====== START ======
+init();
+</script>
+</body>
+</html>
