@@ -637,6 +637,11 @@
       
       <div class="result-breakdown" id="v2-result-breakdown" style="margin-top: 12px; gap: 24px; display: flex;">
       </div>
+
+      <div style="margin-top: 24px; border-top:1px solid var(--border); padding-top:16px;">
+        <input type="text" id="v2-client-name" class="input" placeholder="Nume client / proiect (opțional)" style="margin-bottom:8px;">
+        <button class="btn btn-primary" onclick="saveQuoteV2()" style="width:100%; height:44px; font-size:14px;">💾 Salvează Deviz</button>
+      </div>
     </div>
     
     <!-- TABEL DEVIZ V2 -->
@@ -692,6 +697,10 @@
   <div class="card">
     <div class="card-title"><div class="icon">🔧</div> Circuite dedicate</div>
     <div id="price-editor-circuite"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon">💡</div> Benzi LED (Manoperă)</div>
+    <div id="price-editor-led"></div>
   </div>
   <div class="card">
     <div class="card-title"><div class="icon">🛡️</div> Servicii & verificări</div>
@@ -788,11 +797,17 @@ const DEFAULT_PRICES = {
   'camera': { name: 'Cameră supraveghere (cablaj+montaj)', unit: 'buc', price: 100, hasQty: true },
   'retea-date': { name: 'Punct rețea date / internet', unit: 'buc', price: 80, hasQty: true },
   'deplasare': { name: 'Deplasare / transport', unit: 'set', price: 100, hasQty: false },
+  // led
+  'il_led_basic': { name: 'Bandă LED BASIC', unit: 'ml', price: 32.5, hasQty: true },
+  'il_led_std': { name: 'Bandă LED STANDARD', unit: 'ml', price: 55, hasQty: true },
+  'il_led_prem': { name: 'Bandă LED PREMIUM', unit: 'ml', price: 100, hasQty: true },
+  'il_led_cx': { name: 'Bandă LED COMPLEX', unit: 'ml', price: 150, hasQty: true }
 };
 
 const PRICE_GROUPS = {
   base: ['tablou','cablare-mp','prize','prize-duble','intrerupatoare','comutatoare','corpuri-iluminat','spotturi'],
   circuite: ['plita','cuptor','boiler','masina-spalat','aer-conditionat','pompa-caldura','incarcator-ev'],
+  led: ['il_led_basic', 'il_led_std', 'il_led_prem', 'il_led_cx'],
   servicii: ['impamantare','verificare-pram','proiect','paratrasnet','videointerfon','alarma','camera','retea-date','deplasare']
 };
 
@@ -819,6 +834,13 @@ function init() {
   Object.keys(DEFAULT_PRICES).forEach(k => {
     const el = document.getElementById('tog-' + k);
     if (el) toggleState[k] = el.classList.contains('on');
+  });
+
+  // Sincronizare preturi LED in BUILDER_DATA
+  BUILDER_DATA.iluminat.forEach(item => {
+    if (prices[item.id]) {
+      item.price = prices[item.id].price;
+    }
   });
 
   buildPriceEditor();
@@ -959,6 +981,20 @@ function saveQuote() {
   renderQuotes();
 }
 
+function saveQuoteV2() {
+  const suprafata = document.getElementById('v2-suprafata').value;
+  const client = document.getElementById('v2-client-name').value || 'Deviz Dinamic';
+  const tipEl = document.getElementById('v2-tip-lucrare');
+  const tip = tipEl.options[tipEl.selectedIndex].text.split('(')[0].trim();
+  const total = document.getElementById('v2-total-general').textContent;
+  const date = new Date().toLocaleDateString('ro-RO');
+
+  savedQuotes.unshift({ client, tip, suprafata, total, date, id: Date.now() });
+  localStorage.setItem('eleccalc_quotes', JSON.stringify(savedQuotes));
+  showToast('💾 Deviz salvat!');
+  renderQuotes();
+}
+
 function renderQuotes() {
   const el = document.getElementById('quotesList');
   if (savedQuotes.length === 0) {
@@ -1005,6 +1041,13 @@ function buildPriceEditor() {
 
 function updatePrice(key, val) {
   prices[key].price = parseFloat(val) || 0;
+  
+  // Update in BUILDER_DATA daca exista
+  for (let cat in BUILDER_DATA) {
+    let item = BUILDER_DATA[cat].find(i => i.id === key);
+    if (item) item.price = prices[key].price;
+  }
+  
   updatePriceLabels();
   calcAll();
 }
