@@ -617,17 +617,17 @@
         <div class="price-row-name">Nr. circuite dedicate</div>
         <input class="price-input" type="number" id="v2-circuite" value="2" min="0">
       </div>
-      <div class="price-row" style="padding: 6px 0;">
-        <div class="price-row-name" style="line-height: 1.2;">Tablou Nivel 1 - Simplu (6-10 sig.)<br><small style="font-weight:normal; color:var(--text3);">Garsoniere / ap. mici</small></div>
-        <input class="price-input" type="number" id="v2-tablou-simplu" value="0" min="0">
-      </div>
-      <div class="price-row" style="padding: 6px 0;">
-        <div class="price-row-name" style="line-height: 1.2;">Tablou Nivel 2 - Mediu (11-18 sig.)<br><small style="font-weight:normal; color:var(--text3);">Apartamente standard 2-3 camere</small></div>
-        <input class="price-input" type="number" id="v2-tablou-mediu" value="1" min="0">
-      </div>
-      <div class="price-row" style="padding: 6px 0;">
-        <div class="price-row-name" style="line-height: 1.2;">Tablou Nivel 3 - Complex (19-30 sig.)<br><small style="font-weight:normal; color:var(--text3);">Apartamente mari / case</small></div>
-        <input class="price-input" type="number" id="v2-tablou-complex" value="0" min="0">
+      <div class="price-row" style="padding: 6px 0; display: flex; flex-direction: column; align-items: flex-start;">
+        <div class="price-row-name" style="margin-bottom: 6px;">Tablou principal</div>
+        <div style="display: flex; gap: 8px; width: 100%;">
+          <select class="input" id="v2-tablou-tip" style="flex: 1; padding: 4px 8px; height: 38px; font-size: 14px;">
+            <option value="none">Fără tablou</option>
+            <option value="TABLOU_SIMPLU">Nivel 1 - Simplu (1-10 sig.)</option>
+            <option value="TABLOU_MEDIU" selected>Nivel 2 - Mediu (11-18 sig.)</option>
+            <option value="TABLOU_COMPLEX">Nivel 3 - Complex (19-30 sig.)</option>
+          </select>
+          <input class="price-input" type="number" id="v2-tablou-qty" value="1" min="0" style="width: 60px;">
+        </div>
       </div>
     </div>
 
@@ -833,13 +833,9 @@ const DEFAULT_PRICES = {
   'il_led_prem': { name: 'Bandă LED PREMIUM', unit: 'ml', price: 100 },
   'il_led_cx': { name: 'Bandă LED COMPLEX', unit: 'ml', price: 150 },
   // tablou
-  'tb_mcb': { name: 'Siguranță automată (MCB)', unit: 'buc', price: 35 },
-  'tb_rcd': { name: 'Diferențială (RCD)', unit: 'buc', price: 130 },
-  'tb_simplu': { name: 'Tablou Nivel 1 (6-10 siguranțe)', unit: 'buc', price: 400 },
+  'tb_simplu': { name: 'Tablou Nivel 1 (1-10 siguranțe)', unit: 'buc', price: 400 },
   'tb_mediu': { name: 'Tablou Nivel 2 (11-18 siguranțe)', unit: 'buc', price: 550 },
   'tb_complex': { name: 'Tablou Nivel 3 (19-30 siguranțe)', unit: 'buc', price: 775 },
-  'tb_reorg': { name: 'Reorganizare tablou existent', unit: 'set', price: 400 },
-  'tb_eticheta': { name: 'Etichetare circuite', unit: 'tablou', price: 85 },
   // circuite v2
   'cab_mp': { name: 'Cablare pe mp', unit: 'mp', price: 50 },
   'circ_prize': { name: 'Circuit prize general', unit: 'circuit', price: 150 },
@@ -857,7 +853,7 @@ const DEFAULT_PRICES = {
 
 const PRICE_GROUPS = {
   iluminat: ['pct_lumina_s','il_gen','il_led_basic','il_led_std','il_led_prem','il_led_cx'],
-  tablou: ['tb_simplu','tb_mediu','tb_complex','tb_mcb','tb_rcd','tb_reorg','tb_eticheta'],
+  tablou: ['tb_simplu','tb_mediu','tb_complex'],
   circuite_v2: ['cab_mp','circ_prize','circ_iluminat','circ_bucatarie','pct_priza_s','pct_priza_d','pct_intrerup'],
   low_current: ['lc_tv','lc_rj45','lc_interfon','lc_smart']
 };
@@ -1042,15 +1038,14 @@ function saveQuoteV2() {
     acces: document.getElementById('v2-acces').value,
     suprafata: suprafata,
     discount: document.getElementById('v2-discount').value,
+    tablouTip: document.getElementById('v2-tablou-tip').value,
+    tablouQty: document.getElementById('v2-tablou-qty').value,
     qtys: {
       "POINT_LIGHT_SIMPLE": document.getElementById('v2-puncte').value,
       "SOCKET_SINGLE": document.getElementById('v2-prize-simple').value,
       "SOCKET_DOUBLE": document.getElementById('v2-prize-duble').value,
       "SWITCH_SINGLE": document.getElementById('v2-intrerupatoare').value,
-      "CIRCUIT_DEDICATED": document.getElementById('v2-circuite').value,
-      "TABLOU_SIMPLU": document.getElementById('v2-tablou-simplu').value,
-      "TABLOU_MEDIU": document.getElementById('v2-tablou-mediu').value,
-      "TABLOU_COMPLEX": document.getElementById('v2-tablou-complex').value
+      "CIRCUIT_DEDICATED": document.getElementById('v2-circuite').value
     },
     leds: Array.from(document.querySelectorAll('.led-row')).map(row => ({
       tip: row.querySelector('.led-tip').value,
@@ -1112,14 +1107,26 @@ function loadQuote(i) {
     document.getElementById('v2-circuite').value = q.state.qtys["CIRCUIT_DEDICATED"] || 0;
     
     // Support for older saved devize
-    if (q.state.qtys["TABLOU_MAIN"] !== undefined) {
-      document.getElementById('v2-tablou-mediu').value = q.state.qtys["TABLOU_MAIN"];
-      document.getElementById('v2-tablou-simplu').value = 0;
-      document.getElementById('v2-tablou-complex').value = 0;
+    if (q.state.tablouTip !== undefined) {
+      document.getElementById('v2-tablou-tip').value = q.state.tablouTip;
+      document.getElementById('v2-tablou-qty').value = q.state.tablouQty || 0;
+    } else if (q.state.qtys["TABLOU_MAIN"] !== undefined) {
+      document.getElementById('v2-tablou-tip').value = "TABLOU_MEDIU";
+      document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_MAIN"];
     } else {
-      document.getElementById('v2-tablou-simplu').value = q.state.qtys["TABLOU_SIMPLU"] || 0;
-      document.getElementById('v2-tablou-mediu').value = q.state.qtys["TABLOU_MEDIU"] || 0;
-      document.getElementById('v2-tablou-complex').value = q.state.qtys["TABLOU_COMPLEX"] || 0;
+      if (q.state.qtys["TABLOU_SIMPLU"] > 0) {
+        document.getElementById('v2-tablou-tip').value = "TABLOU_SIMPLU";
+        document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_SIMPLU"];
+      } else if (q.state.qtys["TABLOU_COMPLEX"] > 0) {
+        document.getElementById('v2-tablou-tip').value = "TABLOU_COMPLEX";
+        document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_COMPLEX"];
+      } else if (q.state.qtys["TABLOU_MEDIU"] > 0) {
+        document.getElementById('v2-tablou-tip').value = "TABLOU_MEDIU";
+        document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_MEDIU"];
+      } else {
+        document.getElementById('v2-tablou-tip').value = "none";
+        document.getElementById('v2-tablou-qty').value = 0;
+      }
     }
   }
   
@@ -1175,14 +1182,27 @@ function generatePDF(i, skipReload = false) {
       document.getElementById('v2-prize-duble').value = q.state.qtys["SOCKET_DOUBLE"] || 0;
       document.getElementById('v2-intrerupatoare').value = q.state.qtys["SWITCH_SINGLE"] || 0;
       document.getElementById('v2-circuite').value = q.state.qtys["CIRCUIT_DEDICATED"] || 0;
-      if (q.state.qtys["TABLOU_MAIN"] !== undefined) {
-        document.getElementById('v2-tablou-mediu').value = q.state.qtys["TABLOU_MAIN"];
-        document.getElementById('v2-tablou-simplu').value = 0;
-        document.getElementById('v2-tablou-complex').value = 0;
+      
+      if (q.state.tablouTip !== undefined) {
+        document.getElementById('v2-tablou-tip').value = q.state.tablouTip;
+        document.getElementById('v2-tablou-qty').value = q.state.tablouQty || 0;
+      } else if (q.state.qtys["TABLOU_MAIN"] !== undefined) {
+        document.getElementById('v2-tablou-tip').value = "TABLOU_MEDIU";
+        document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_MAIN"];
       } else {
-        document.getElementById('v2-tablou-simplu').value = q.state.qtys["TABLOU_SIMPLU"] || 0;
-        document.getElementById('v2-tablou-mediu').value = q.state.qtys["TABLOU_MEDIU"] || 0;
-        document.getElementById('v2-tablou-complex').value = q.state.qtys["TABLOU_COMPLEX"] || 0;
+        if (q.state.qtys["TABLOU_SIMPLU"] > 0) {
+          document.getElementById('v2-tablou-tip').value = "TABLOU_SIMPLU";
+          document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_SIMPLU"];
+        } else if (q.state.qtys["TABLOU_COMPLEX"] > 0) {
+          document.getElementById('v2-tablou-tip').value = "TABLOU_COMPLEX";
+          document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_COMPLEX"];
+        } else if (q.state.qtys["TABLOU_MEDIU"] > 0) {
+          document.getElementById('v2-tablou-tip').value = "TABLOU_MEDIU";
+          document.getElementById('v2-tablou-qty').value = q.state.qtys["TABLOU_MEDIU"];
+        } else {
+          document.getElementById('v2-tablou-tip').value = "none";
+          document.getElementById('v2-tablou-qty').value = 0;
+        }
       }
     }
     
@@ -1546,7 +1566,7 @@ const PRICING_DATA_V2 = {
     { code: "SOCKET_DOUBLE", price_id: "pct_priza_d", unit: "buc", description: "Priză dublă" },
     { code: "SWITCH_SINGLE", price_id: "pct_intrerup", unit: "buc", description: "Întrerupător simplu" },
     { code: "CIRCUIT_DEDICATED", price_id: "circ_prize", unit: "buc", description: "Circuit dedicat" },
-    { code: "TABLOU_SIMPLU", price_id: "tb_simplu", unit: "buc", description: "Tablou Nivel 1 (6-10 siguranțe)" },
+    { code: "TABLOU_SIMPLU", price_id: "tb_simplu", unit: "buc", description: "Tablou Nivel 1 (1-10 siguranțe)" },
     { code: "TABLOU_MEDIU", price_id: "tb_mediu", unit: "buc", description: "Tablou Nivel 2 (11-18 siguranțe)" },
     { code: "TABLOU_COMPLEX", price_id: "tb_complex", unit: "buc", description: "Tablou Nivel 3 (19-30 siguranțe)" }
   ]
@@ -1566,9 +1586,9 @@ function calculeazaV2() {
     "SOCKET_DOUBLE": parseInt(document.getElementById('v2-prize-duble').value) || 0,
     "SWITCH_SINGLE": parseInt(document.getElementById('v2-intrerupatoare').value) || 0,
     "CIRCUIT_DEDICATED": parseInt(document.getElementById('v2-circuite').value) || 0,
-    "TABLOU_SIMPLU": parseInt(document.getElementById('v2-tablou-simplu').value) || 0,
-    "TABLOU_MEDIU": parseInt(document.getElementById('v2-tablou-mediu').value) || 0,
-    "TABLOU_COMPLEX": parseInt(document.getElementById('v2-tablou-complex').value) || 0
+    "TABLOU_SIMPLU": document.getElementById('v2-tablou-tip').value === "TABLOU_SIMPLU" ? (parseInt(document.getElementById('v2-tablou-qty').value) || 0) : 0,
+    "TABLOU_MEDIU": document.getElementById('v2-tablou-tip').value === "TABLOU_MEDIU" ? (parseInt(document.getElementById('v2-tablou-qty').value) || 0) : 0,
+    "TABLOU_COMPLEX": document.getElementById('v2-tablou-tip').value === "TABLOU_COMPLEX" ? (parseInt(document.getElementById('v2-tablou-qty').value) || 0) : 0
   };
 
   let totalBaza = 0;
@@ -1695,10 +1715,9 @@ function resetCalculatorV2() {
   document.getElementById('v2-prize-simple').value = "0";
   document.getElementById('v2-prize-duble').value = "0";
   document.getElementById('v2-intrerupatoare').value = "0";
-  document.getElementById('v2-circuite').value = "0";
-  document.getElementById('v2-tablou-simplu').value = "0";
-  document.getElementById('v2-tablou-mediu').value = "1";
-  document.getElementById('v2-tablou-complex').value = "0";
+  document.getElementById('v2-circuite').value = "2";
+  document.getElementById('v2-tablou-tip').value = "TABLOU_MEDIU";
+  document.getElementById('v2-tablou-qty').value = "1";
   
   document.getElementById('led-rows-container').innerHTML = '';
   ledRowCounter = 0;
