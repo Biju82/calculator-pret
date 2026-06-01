@@ -1035,8 +1035,12 @@
     <div id="price-editor-servicii"></div>
   </div>
 
-  <button class="btn btn-primary" onclick="savePrices()">✅ Salvează prețuri</button>
-  <button class="btn btn-danger" onclick="resetPrices()">↩️ Resetează la default</button>
+  <button class="btn btn-primary" onclick="savePrices()">✅ Salvează prețuri curente</button>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+    <button class="btn btn-secondary" style="margin-top: 0;" onclick="setAsDefaultPrices()">⭐ Setează ca default-ul meu</button>
+    <button class="btn btn-secondary" style="margin-top: 0;" onclick="resetToOriginal()">↩️ Revino la prețurile inițiale</button>
+  </div>
+  <button class="btn btn-danger" onclick="resetPrices()">🔄 Resetează la default-ul meu</button>
 </div>
 
 <!-- ========== INFO ========== -->
@@ -1136,7 +1140,14 @@ let savedQuotes = [];
 // ====== INIT ======
 function init() {
   const saved = localStorage.getItem('eleccalc_prices');
-  prices = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_PRICES));
+  const userDefaults = localStorage.getItem('eleccalc_user_defaults');
+  if (saved) {
+    prices = JSON.parse(saved);
+  } else if (userDefaults) {
+    prices = JSON.parse(userDefaults);
+  } else {
+    prices = JSON.parse(JSON.stringify(DEFAULT_PRICES));
+  }
 
   const savedQ = localStorage.getItem('eleccalc_quotes');
   savedQuotes = savedQ ? JSON.parse(savedQ) : [];
@@ -1340,14 +1351,32 @@ function savePrices() {
   showToast('✅ Prețuri salvate!');
 }
 
+function setAsDefaultPrices() {
+  if (!confirm('Setezi prețurile actuale ca fiind cele implicite pentru viitoarele resetări?')) return;
+  localStorage.setItem('eleccalc_user_defaults', JSON.stringify(prices));
+  showToast('⭐ Prețuri setate ca default!');
+}
+
 function resetPrices() {
-  if (!confirm('Resetezi toate prețurile la valorile implicite?')) return;
-  prices = JSON.parse(JSON.stringify(DEFAULT_PRICES));
+  if (!confirm('Resetezi toate prețurile la valorile tale implicite?')) return;
+  const userDefaults = localStorage.getItem('eleccalc_user_defaults');
+  prices = userDefaults ? JSON.parse(userDefaults) : JSON.parse(JSON.stringify(DEFAULT_PRICES));
   localStorage.removeItem('eleccalc_prices');
   buildPriceEditor();
   updatePriceLabels();
   calcAll();
-  showToast('↩️ Prețuri resetate');
+  showToast('↩️ Prețuri resetate la default-ul tău');
+}
+
+function resetToOriginal() {
+  if (!confirm('Atenție: Revii la prețurile inițiale ale aplicației (cele de bază) și ștergi default-ul tău?')) return;
+  localStorage.removeItem('eleccalc_user_defaults');
+  localStorage.removeItem('eleccalc_prices');
+  prices = JSON.parse(JSON.stringify(DEFAULT_PRICES));
+  buildPriceEditor();
+  updatePriceLabels();
+  calcAll();
+  showToast('↩️ Prețuri inițiale restaurate');
 }
 
 // ====== RESET CALC ======
