@@ -530,7 +530,7 @@
 <div class="header">
   <div class="header-top">
     <div class="logo">Elec<span>Calc</span></div>
-    <div class="version-badge">v1.0 · 2025</div>
+    <div class="version-badge">v1.1 &middot; 2026</div>
   </div>
   <div class="header-sub">Calculator profesional instalații electrice</div>
 </div>
@@ -545,503 +545,46 @@
 <!-- ========== CALCULATOR ========== -->
 <div class="content">
 <div id="tab-calculator" class="section active">
-  <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-    <button class="btn btn-secondary" id="btn-v1" onclick="switchVersion('v1')" style="margin-top: 0; flex: 1; border-color: var(--accent); color: var(--accent);">V1.0 Simplu</button>
-    <button class="btn btn-secondary" id="btn-v2" onclick="switchVersion('v2')" style="margin-top: 0; flex: 1;">V2.0 Avansat (2026)</button>
-  </div>
-
-  <div id="calculator-v1">
-    <div class="section-header">Deviz nou</div>
-    <div class="section-sub">Completează parametrii lucrării</div>
-
-  <!-- TIP LUCRARE -->
-  <div class="card">
-    <div class="card-title"><div class="icon">🏗️</div> Tip lucrare</div>
-    <div class="field">
-      <label class="label">Client / Adresă (opțional)</label>
-      <input class="input" type="text" id="clientName" placeholder="ex: Ion Popescu, Str. Castanilor 5">
-    </div>
-    <div class="field">
-      <label class="label">Tip lucrare</label>
-      <select class="input" id="tipLucrare" onchange="updateUI()">
-        <option value="instalatie_noua">Instalație completă nouă (la roșu)</option>
-        <option value="renovare">Renovare / Înlocuire instalație</option>
-        <option value="extindere">Extindere instalație existentă</option>
-        <option value="interventie">Intervenție / Reparație</option>
-      </select>
-    </div>
-    <div class="input-row">
-      <div class="field">
-        <label class="label">Tip clădire</label>
-        <select class="input" id="tipCladire" onchange="updateUI()">
-          <option value="apartament">Apartament</option>
-          <option value="casa">Casă</option>
-          <option value="spatiu_comercial">Spațiu comercial</option>
-          <option value="birou">Birou</option>
-        </select>
-      </div>
-      <div class="field">
-        <label class="label">Suprafață (mp)</label>
-        <input class="input" type="number" id="suprafata" value="60" min="1" oninput="calcAll()">
-      </div>
-    </div>
-    <div class="field">
-      <label class="label">Nr. camere: <span id="camereVal">3</span></label>
-      <input type="range" id="camere" min="1" max="10" value="3" oninput="document.getElementById('camereVal').textContent=this.value; calcAll()">
-    </div>
-  </div>
-
-  <!-- INSTALATIE COMPLETA -->
-  <div class="card" id="card-instalatie">
-    <div class="card-title"><div class="icon">⚡</div> Instalație de bază</div>
-
-    <div class="check-item" onclick="toggleCheck('tablou')">
-      <div class="check-left">
-        <div class="check-icon">🔲</div>
-        <div class="check-info">
-          <div class="check-name">Tablou electric nou</div>
-          <div class="check-price" id="price-tablou-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-tablou" value="1" min="1" max="5" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle on" id="tog-tablou"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('cablare-mp')">
-      <div class="check-left">
-        <div class="check-icon">〰️</div>
-        <div class="check-info">
-          <div class="check-name">Cablare pe mp (inclus circuite)</div>
-          <div class="check-price" id="price-cablare-mp-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle on" id="tog-cablare-mp"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('prize')">
-      <div class="check-left">
-        <div class="check-icon">🔌</div>
-        <div class="check-info">
-          <div class="check-name">Prize simple</div>
-          <div class="check-price" id="price-prize-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-prize" value="10" min="1" max="100" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle on" id="tog-prize"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('prize-duble')">
-      <div class="check-left">
-        <div class="check-icon">🔌</div>
-        <div class="check-info">
-          <div class="check-name">Prize duble</div>
-          <div class="check-price" id="price-prize-duble-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-prize-duble" value="4" min="0" max="50" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-prize-duble"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('intrerupatoare')">
-      <div class="check-left">
-        <div class="check-icon">💡</div>
-        <div class="check-info">
-          <div class="check-name">Întrerupătoare</div>
-          <div class="check-price" id="price-intrerupatoare-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-intrerupatoare" value="6" min="1" max="50" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle on" id="tog-intrerupatoare"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('comutatoare')">
-      <div class="check-left">
-        <div class="check-icon">🔄</div>
-        <div class="check-info">
-          <div class="check-name">Comutatoare (cap-scară)</div>
-          <div class="check-price" id="price-comutatoare-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-comutatoare" value="2" min="0" max="20" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-comutatoare"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('corpuri-iluminat')">
-      <div class="check-left">
-        <div class="check-icon">🔦</div>
-        <div class="check-info">
-          <div class="check-name">Corp iluminat / lustră</div>
-          <div class="check-price" id="price-corpuri-iluminat-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-corpuri-iluminat" value="5" min="0" max="50" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle on" id="tog-corpuri-iluminat"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('spotturi')">
-      <div class="check-left">
-        <div class="check-icon">🔆</div>
-        <div class="check-info">
-          <div class="check-name">Spoturi încastrate</div>
-          <div class="check-price" id="price-spotturi-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-spotturi" value="0" min="0" max="100" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-spotturi"></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CIRCUITE DEDICATE -->
-  <div class="card">
-    <div class="card-title"><div class="icon">🔧</div> Circuite dedicate</div>
-
-    <div class="check-item" onclick="toggleCheck('plita')">
-      <div class="check-left">
-        <div class="check-icon">🍳</div>
-        <div class="check-info">
-          <div class="check-name">Circuit plită electrică / inducție</div>
-          <div class="check-price" id="price-plita-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-plita" value="1" min="1" max="3" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-plita"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('cuptor')">
-      <div class="check-left">
-        <div class="check-icon">🔥</div>
-        <div class="check-info">
-          <div class="check-name">Circuit cuptor electric</div>
-          <div class="check-price" id="price-cuptor-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-cuptor" value="1" min="1" max="2" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-cuptor"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('boiler')">
-      <div class="check-left">
-        <div class="check-icon">🚿</div>
-        <div class="check-info">
-          <div class="check-name">Circuit boiler electric</div>
-          <div class="check-price" id="price-boiler-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-boiler" value="1" min="1" max="3" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-boiler"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('masina-spalat')">
-      <div class="check-left">
-        <div class="check-icon">🫧</div>
-        <div class="check-info">
-          <div class="check-name">Circuit mașină de spălat</div>
-          <div class="check-price" id="price-masina-spalat-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-masina-spalat" value="1" min="1" max="3" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-masina-spalat"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('aer-conditionat')">
-      <div class="check-left">
-        <div class="check-icon">❄️</div>
-        <div class="check-info">
-          <div class="check-name">Circuit aer condiționat</div>
-          <div class="check-price" id="price-aer-conditionat-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-aer-conditionat" value="1" min="1" max="5" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-aer-conditionat"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('pompa-caldura')">
-      <div class="check-left">
-        <div class="check-icon">🌡️</div>
-        <div class="check-info">
-          <div class="check-name">Circuit pompă de căldură</div>
-          <div class="check-price" id="price-pompa-caldura-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-pompa-caldura" value="1" min="1" max="2" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-pompa-caldura"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('incarcator-ev')">
-      <div class="check-left">
-        <div class="check-icon">🚗</div>
-        <div class="check-info">
-          <div class="check-name">Stație încărcare EV (wallbox)</div>
-          <div class="check-price" id="price-incarcator-ev-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-incarcator-ev" value="1" min="1" max="2" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-incarcator-ev"></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- SERVICII SUPLIMENTARE -->
-  <div class="card">
-    <div class="card-title"><div class="icon">🛡️</div> Servicii & verificări</div>
-
-    <div class="check-item" onclick="toggleCheck('impamantare')">
-      <div class="check-left">
-        <div class="check-icon">🌍</div>
-        <div class="check-info">
-          <div class="check-name">Priză de pământ (împământare)</div>
-          <div class="check-price" id="price-impamantare-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle off" id="tog-impamantare"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('verificare-pram')">
-      <div class="check-left">
-        <div class="check-icon">📋</div>
-        <div class="check-info">
-          <div class="check-name">Verificare PRAM + buletin</div>
-          <div class="check-price" id="price-verificare-pram-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle off" id="tog-verificare-pram"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('proiect')">
-      <div class="check-left">
-        <div class="check-icon">📐</div>
-        <div class="check-info">
-          <div class="check-name">Proiect electric (schemă)</div>
-          <div class="check-price" id="price-proiect-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle off" id="tog-proiect"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('paratrasnet')">
-      <div class="check-left">
-        <div class="check-icon">⛈️</div>
-        <div class="check-info">
-          <div class="check-name">Paratrăsnet</div>
-          <div class="check-price" id="price-paratrasnet-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle off" id="tog-paratrasnet"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('videointerfon')">
-      <div class="check-left">
-        <div class="check-icon">🔔</div>
-        <div class="check-info">
-          <div class="check-name">Videointerfon / sonerie</div>
-          <div class="check-price" id="price-videointerfon-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle off" id="tog-videointerfon"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('alarma')">
-      <div class="check-left">
-        <div class="check-icon">🚨</div>
-        <div class="check-info">
-          <div class="check-name">Sistem alarmă (cablaj)</div>
-          <div class="check-price" id="price-alarma-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle off" id="tog-alarma"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('camera')">
-      <div class="check-left">
-        <div class="check-icon">📷</div>
-        <div class="check-info">
-          <div class="check-name">Cameră supraveghere (cablaj/montaj)</div>
-          <div class="check-price" id="price-camera-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-camera" value="2" min="1" max="20" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-camera"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('retea-date')">
-      <div class="check-left">
-        <div class="check-icon">🌐</div>
-        <div class="check-info">
-          <div class="check-name">Rețea date / cablaj internet</div>
-          <div class="check-price" id="price-retea-date-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <input class="check-qty" type="number" id="qty-retea-date" value="3" min="1" max="20" onclick="event.stopPropagation()" oninput="calcAll()">
-        <button class="toggle off" id="tog-retea-date"></button>
-      </div>
-    </div>
-
-    <div class="check-item" onclick="toggleCheck('deplasare')">
-      <div class="check-left">
-        <div class="check-icon">🚐</div>
-        <div class="check-info">
-          <div class="check-name">Deplasare / transport</div>
-          <div class="check-price" id="price-deplasare-label"></div>
-        </div>
-      </div>
-      <div class="check-right">
-        <button class="toggle off" id="tog-deplasare"></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MAJORĂRI -->
-  <div class="card">
-    <div class="card-title"><div class="icon">📊</div> Ajustări preț</div>
-
-    <div class="field">
-      <label class="label">Dificultate lucrare</label>
-      <select class="input" id="dificultate" onchange="calcAll()">
-        <option value="1">Standard</option>
-        <option value="1.2">Dificil (+20%) — beton, acces greu</option>
-        <option value="1.4">Foarte dificil (+40%) — condiții speciale</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label class="label">Urgență</label>
-      <select class="input" id="urgenta" onchange="calcAll()">
-        <option value="1">Normal</option>
-        <option value="1.25">Urgent (+25%)</option>
-        <option value="1.5">Foarte urgent (+50%)</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label class="label">Reducere client (%)</label>
-      <input class="input" type="number" id="reducere" value="0" min="0" max="30" oninput="calcAll()">
-    </div>
-
-    <div class="field">
-      <label class="label">Materiale estimate (lei) — opțional</label>
-      <input class="input" type="number" id="materiale" value="0" min="0" placeholder="0 = doar manoperă" oninput="calcAll()">
-    </div>
-  </div>
-
-  <!-- RESULT -->
-  <div class="result-panel" id="resultPanel">
-    <div class="result-label">TOTAL ESTIMAT MANOPERĂ</div>
-    <div class="result-total" id="totalDisplay">0 lei</div>
-    <div class="result-breakdown">
-      <div class="result-item">Manoperă: <span id="manoperaDisplay">0 lei</span></div>
-      <div class="result-item">Materiale: <span id="materialeDisplay">0 lei</span></div>
-    </div>
-    <div class="profit-bar" id="totalCuMateriale" style="display:none">
-      <div class="profit-label">Total cu materiale</div>
-      <div class="profit-value pos" id="totalCuMaterialeVal">0 lei</div>
-    </div>
-  </div>
-
-  <!-- DETALII -->
-  <div class="card">
-    <div class="card-title"><div class="icon">📄</div> Detalii deviz</div>
-    <div class="line-items" id="lineItems">
-      <div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Selectează serviciile de mai sus</div></div>
-    </div>
-  </div>
-
-  <button class="btn btn-primary" onclick="saveQuote()">💾 Salvează deviz (Local)</button>
-  <button class="btn btn-secondary" onclick="exportPDF()">🖨️ Exportă deviz (PDF)</button>
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
-    <button class="btn btn-secondary" style="margin-top: 0;" onclick="exportJSON()">⬇️ Descarcă (.json)</button>
-    <label class="btn btn-secondary" style="margin-top: 0; display:flex; align-items:center; justify-content:center; cursor:pointer; text-align:center;">
-      ⬆️ Încarcă (.json)
-      <input type="file" id="importJson" accept=".json" style="display:none" onchange="importJSON(event)">
-    </label>
-  </div>
-  <button class="btn btn-danger" onclick="resetCalc()">🔄 Deviz nou / Resetează</button>
-  </div> <!-- /calculator-v1 -->
-
-  <div id="calculator-v2" style="display: none;">
+  <div id="calculator-v2">
     <div class="section-header">Deviz Avansat (2026)</div>
-    <div class="section-sub">Structură detaliată cu materiale și manoperă</div>
+    <div class="section-sub">Configurare deviz electric conform formulei de coeficienți</div>
 
     <!-- DATE INTRARE -->
     <div class="card">
       <div class="card-title"><div class="icon">📝</div> Parametri Generali</div>
+      
       <div class="input-row">
         <div class="field">
-          <label class="label">Suprafață (mp)</label>
-          <input class="input" type="number" id="v2-suprafata" value="60" min="1">
+          <label class="label">Tip lucrare</label>
+          <select class="input" id="v2-tip-lucrare">
+            <option value="1.0">Apartament nou (x1.0)</option>
+            <option value="1.15">Casă nouă (x1.15)</option>
+            <option value="1.45">Renovare completă (x1.45)</option>
+            <option value="1.60">Renovare locuită (x1.60)</option>
+          </select>
         </div>
         <div class="field">
-          <label class="label">Regiune</label>
-          <select class="input" id="v2-regiune">
-            <option value="implicit">Implicit</option>
-            <option value="oras">Oraș mare (+15% manoperă)</option>
-            <option value="rural">Zonă rurală (-10% manoperă)</option>
+          <label class="label">Dificultate pereți</label>
+          <select class="input" id="v2-dificultate-pereti">
+            <option value="1.0">BCA (x1.0)</option>
+            <option value="1.1">Cărămidă (x1.1)</option>
+            <option value="1.25">Beton (x1.25)</option>
           </select>
         </div>
       </div>
       
       <div class="input-row" style="margin-top: 8px;">
-        <div class="check-item" style="border:none; padding: 0;">
-          <div class="check-left" style="gap: 6px;">
-            <div class="check-icon">✨</div>
-            <div class="check-name" style="font-size:12px;">Aparataj Premium (+30% materiale)</div>
-          </div>
-          <div class="check-right">
-             <button class="toggle off" id="v2-premium" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></button>
-          </div>
+        <div class="field">
+          <label class="label">Acces</label>
+          <select class="input" id="v2-acces">
+            <option value="1.0">Normal (x1.0)</option>
+            <option value="1.1">Mobilat (x1.1)</option>
+            <option value="1.15">Locuit (x1.15)</option>
+          </select>
         </div>
-        
-        <div class="check-item" style="border:none; padding: 0;">
-          <div class="check-left" style="gap: 6px;">
-            <div class="check-icon">🧱</div>
-            <div class="check-name" style="font-size:12px;">Spargere pereți (+40% manoperă)</div>
-          </div>
-          <div class="check-right">
-             <button class="toggle off" id="v2-spargere" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></button>
-          </div>
+        <div class="field">
+          <label class="label">Suprafață (mp)</label>
+          <input class="input" type="number" id="v2-suprafata" value="60" min="1">
         </div>
       </div>
     </div>
@@ -1080,18 +623,10 @@
 
     <!-- REZULTAT V2 -->
     <div class="result-panel" id="v2-rezultat-panel" style="display:none;">
-      <div class="result-label">Total General</div>
+      <div class="result-label">Total General (lei)</div>
       <div class="result-total" id="v2-total-general">0 lei</div>
       
-      <div class="result-breakdown" style="margin-top: 12px; gap: 24px;">
-        <div>
-          <div class="result-label" style="font-size:10px;">Total Materiale</div>
-          <div style="font-size:16px; font-weight:700; color:var(--text);" id="v2-total-mat">0 lei</div>
-        </div>
-        <div>
-          <div class="result-label" style="font-size:10px;">Total Manoperă</div>
-          <div style="font-size:16px; font-weight:700; color:var(--text);" id="v2-total-man">0 lei</div>
-        </div>
+      <div class="result-breakdown" id="v2-result-breakdown" style="margin-top: 12px; gap: 24px; display: flex;">
       </div>
     </div>
     
@@ -1104,9 +639,8 @@
             <th style="padding:8px 4px;">Articol</th>
             <th style="padding:8px 4px;">U.M.</th>
             <th style="padding:8px 4px; text-align:center;">Cant.</th>
-            <th style="padding:8px 4px; text-align:right;">Preț Mat.</th>
-            <th style="padding:8px 4px; text-align:right;">Preț Man.</th>
-            <th style="padding:8px 4px; text-align:right; color:var(--text);">Subtotal</th>
+            <th style="padding:8px 4px; text-align:right;">Preț Unitar</th>
+            <th style="padding:8px 4px; text-align:right; color:var(--text);">Subtotal (bază)</th>
           </tr>
         </thead>
         <tbody id="v2-tabel-body">
@@ -1689,21 +1223,22 @@ function switchVersion(ver) {
 
 const PRICING_DATA_V2 = {
   items: [
-    { code: "POINT_LIGHT_SIMPLE", unit: "buc", description: "Punct lumină simplu", material_cost: 20, labor_cost: 80 },
-    { code: "SOCKET_SINGLE", unit: "buc", description: "Priză simplă", material_cost: 25, labor_cost: 70 },
-    { code: "SOCKET_DOUBLE", unit: "buc", description: "Priză dublă", material_cost: 35, labor_cost: 85 },
-    { code: "SWITCH_SINGLE", unit: "buc", description: "Întrerupător simplu", material_cost: 15, labor_cost: 60 },
-    { code: "CIRCUIT_DEDICATED", unit: "buc", description: "Circuit dedicat", material_cost: 150, labor_cost: 100 },
-    { code: "TABLOU_MAIN", unit: "buc", description: "Tablou principal", material_cost: 1000, labor_cost: 500 },
-    { code: "WIRING_GENERAL", unit: "mp", description: "Cablare electrică", material_cost: 20, labor_cost: 50 }
+    { code: "POINT_LIGHT_SIMPLE", unit: "buc", description: "Punct lumină simplu", labor_cost: 80 },
+    { code: "SOCKET_SINGLE", unit: "buc", description: "Priză simplă", labor_cost: 70 },
+    { code: "SOCKET_DOUBLE", unit: "buc", description: "Priză dublă", labor_cost: 85 },
+    { code: "SWITCH_SINGLE", unit: "buc", description: "Întrerupător simplu", labor_cost: 60 },
+    { code: "CIRCUIT_DEDICATED", unit: "buc", description: "Circuit dedicat", labor_cost: 100 },
+    { code: "TABLOU_MAIN", unit: "buc", description: "Tablou principal", labor_cost: 500 },
+    { code: "WIRING_GENERAL", unit: "mp", description: "Cablare electrică", labor_cost: 50 }
   ]
 };
 
 function calculeazaV2() {
   const suprafata = parseInt(document.getElementById('v2-suprafata').value) || 0;
-  const region = document.getElementById('v2-regiune').value;
-  const isPremium = document.getElementById('v2-premium').classList.contains('on');
-  const isSpargere = document.getElementById('v2-spargere').classList.contains('on');
+  
+  const coefLucrare = parseFloat(document.getElementById('v2-tip-lucrare').value) || 1.0;
+  const coefPereti = parseFloat(document.getElementById('v2-dificultate-pereti').value) || 1.0;
+  const coefAcces = parseFloat(document.getElementById('v2-acces').value) || 1.0;
   
   // Qty mapping
   const qtys = {
@@ -1716,49 +1251,21 @@ function calculeazaV2() {
     "TABLOU_MAIN": parseInt(document.getElementById('v2-tablouri').value) || 0
   };
 
-  // Multipliers
-  let laborMult = 1.0;
-  if (region === 'oras') laborMult += 0.15;
-  if (region === 'rural') laborMult -= 0.10;
-  
-  const laborCablareMult = isSpargere ? 1.40 : 1.0; // 40% in plus
-  const materialApparatajMult = isPremium ? 1.30 : 1.0; // 30% in plus
-  
-  let totalMat = 0;
-  let totalMan = 0;
+  let totalBaza = 0;
   let html = '';
   
   PRICING_DATA_V2.items.forEach(item => {
     const q = qtys[item.code];
     if (q > 0) {
-      let mat = item.material_cost;
       let man = item.labor_cost;
-      
-      // Apply multipliers
-      if (['SOCKET_SINGLE', 'SOCKET_DOUBLE', 'SWITCH_SINGLE'].includes(item.code)) {
-        mat = mat * materialApparatajMult;
-      }
-      
-      if (item.code === 'WIRING_GENERAL' || item.code === 'CIRCUIT_DEDICATED') {
-        man = man * laborCablareMult;
-      }
-      
-      man = man * laborMult;
-      
-      // Calculate
-      const mCost = mat * q;
-      const lCost = man * q;
-      const sub = mCost + lCost;
-      
-      totalMat += mCost;
-      totalMan += lCost;
+      const sub = man * q;
+      totalBaza += sub;
       
       html += `
         <tr style="border-bottom: 1px solid var(--border);">
           <td style="padding: 8px 4px;">${item.description}</td>
           <td style="padding: 8px 4px; color:var(--text3);">${item.unit}</td>
           <td style="padding: 8px 4px; text-align:center;">${q}</td>
-          <td style="padding: 8px 4px; text-align:right;">${Math.round(mat)} lei</td>
           <td style="padding: 8px 4px; text-align:right;">${Math.round(man)} lei</td>
           <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub)} lei</td>
         </tr>
@@ -1766,10 +1273,26 @@ function calculeazaV2() {
     }
   });
   
+  const coefTotal = coefLucrare * coefPereti * coefAcces;
+  const totalGeneral = totalBaza * coefTotal;
+  
   document.getElementById('v2-tabel-body').innerHTML = html;
-  document.getElementById('v2-total-mat').textContent = Math.round(totalMat).toLocaleString('ro-RO') + ' lei';
-  document.getElementById('v2-total-man').textContent = Math.round(totalMan).toLocaleString('ro-RO') + ' lei';
-  document.getElementById('v2-total-general').textContent = Math.round(totalMat + totalMan).toLocaleString('ro-RO') + ' lei';
+  
+  // Reset panou rezultat
+  document.getElementById('v2-total-general').textContent = Math.round(totalGeneral).toLocaleString('ro-RO') + ' lei';
+  
+  // Afisam detaliile coeficientilor in breakdown
+  const breakdownHtml = `
+    <div>
+      <div class="result-label" style="font-size:10px;">Subtotal bază</div>
+      <div style="font-size:16px; font-weight:700; color:var(--text);">${Math.round(totalBaza).toLocaleString('ro-RO')} lei</div>
+    </div>
+    <div>
+      <div class="result-label" style="font-size:10px;">Multiplicator (Lucrare x Pereți x Acces)</div>
+      <div style="font-size:16px; font-weight:700; color:var(--text);">x${coefTotal.toFixed(2)}</div>
+    </div>
+  `;
+  document.getElementById('v2-result-breakdown').innerHTML = breakdownHtml;
   
   document.getElementById('v2-tabel-card').style.display = 'block';
   document.getElementById('v2-rezultat-panel').style.display = 'block';
