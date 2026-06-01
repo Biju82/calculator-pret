@@ -1043,6 +1043,9 @@ function saveQuoteV2() {
   localStorage.setItem('eleccalc_quotes', JSON.stringify(savedQuotes));
   showToast('💾 Deviz salvat!');
   renderQuotes();
+  
+  // Generare automata PDF
+  generatePDF(0, true);
 }
 
 function renderQuotes() {
@@ -1060,7 +1063,7 @@ function renderQuotes() {
       <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px">
         <div class="quote-total">${q.total}</div>
         <div style="display:flex; gap: 12px;">
-          <button onclick="generatePDF(${i})" style="background:none;border:none;color:#3498db;font-size:12px;cursor:pointer;padding:0;font-weight:bold;">📄 PDF</button>
+          <button onclick="generatePDF(${i})" style="background:none;border:none;color:#3498db;font-size:12px;cursor:pointer;padding:0;font-weight:bold;">📄 descarcă</button>
           <button onclick="loadQuote(${i})" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0;font-weight:bold;">📂 deschide</button>
           <button onclick="deleteQuote(${i})" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;padding:0">✕ șterge</button>
         </div>
@@ -1121,44 +1124,46 @@ function deleteQuote(i) {
   showToast('🗑️ Deviz șters');
 }
 
-function generatePDF(i) {
+function generatePDF(i, skipReload = false) {
   const q = savedQuotes[i];
   if (!q.isV2 || !q.state) {
     alert("Nu putem genera PDF pentru devize vechi.");
     return;
   }
   
-  // Populam formularul pentru a genera datele
-  document.getElementById('v2-tip-lucrare').value = q.state.tipLucrare || '1.0';
-  document.getElementById('v2-dificultate-pereti').value = q.state.dificultatePereti || '1.0';
-  document.getElementById('v2-acces').value = q.state.acces || '1.0';
-  document.getElementById('v2-suprafata').value = q.state.suprafata || '0';
-  
-  if (q.state.qtys) {
-    document.getElementById('v2-puncte').value = q.state.qtys["POINT_LIGHT_SIMPLE"] || 0;
-    document.getElementById('v2-prize-simple').value = q.state.qtys["SOCKET_SINGLE"] || 0;
-    document.getElementById('v2-prize-duble').value = q.state.qtys["SOCKET_DOUBLE"] || 0;
-    document.getElementById('v2-intrerupatoare').value = q.state.qtys["SWITCH_SINGLE"] || 0;
-    document.getElementById('v2-circuite').value = q.state.qtys["CIRCUIT_DEDICATED"] || 0;
-    document.getElementById('v2-tablouri').value = q.state.qtys["TABLOU_MAIN"] || 0;
+  if (!skipReload) {
+    // Populam formularul pentru a genera datele
+    document.getElementById('v2-tip-lucrare').value = q.state.tipLucrare || '1.0';
+    document.getElementById('v2-dificultate-pereti').value = q.state.dificultatePereti || '1.0';
+    document.getElementById('v2-acces').value = q.state.acces || '1.0';
+    document.getElementById('v2-suprafata').value = q.state.suprafata || '0';
+    
+    if (q.state.qtys) {
+      document.getElementById('v2-puncte').value = q.state.qtys["POINT_LIGHT_SIMPLE"] || 0;
+      document.getElementById('v2-prize-simple').value = q.state.qtys["SOCKET_SINGLE"] || 0;
+      document.getElementById('v2-prize-duble').value = q.state.qtys["SOCKET_DOUBLE"] || 0;
+      document.getElementById('v2-intrerupatoare').value = q.state.qtys["SWITCH_SINGLE"] || 0;
+      document.getElementById('v2-circuite').value = q.state.qtys["CIRCUIT_DEDICATED"] || 0;
+      document.getElementById('v2-tablouri').value = q.state.qtys["TABLOU_MAIN"] || 0;
+    }
+    
+    document.getElementById('led-rows-container').innerHTML = '';
+    ledRowCounter = 0;
+    
+    if (q.state.leds && q.state.leds.length > 0) {
+      q.state.leds.forEach(led => {
+        adaugaLinieLED();
+        const row = document.getElementById(`led-row-${ledRowCounter}`);
+        if (row) {
+          row.querySelector('.led-tip').value = led.tip;
+          row.querySelector('.led-ml').value = led.ml;
+        }
+      });
+    }
+    
+    updateLiniiLED();
+    calculeazaV2();
   }
-  
-  document.getElementById('led-rows-container').innerHTML = '';
-  ledRowCounter = 0;
-  
-  if (q.state.leds && q.state.leds.length > 0) {
-    q.state.leds.forEach(led => {
-      adaugaLinieLED();
-      const row = document.getElementById(`led-row-${ledRowCounter}`);
-      if (row) {
-        row.querySelector('.led-tip').value = led.tip;
-        row.querySelector('.led-ml').value = led.ml;
-      }
-    });
-  }
-  
-  updateLiniiLED();
-  calculeazaV2();
   
   // Scapam de CSS variables pentru versiunea light a PDF-ului
   let tbodyHtml = document.getElementById('v2-tabel-body').innerHTML;
