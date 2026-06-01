@@ -592,43 +592,54 @@
       </div>
     </div>
 
-    <!-- MODUL ILUMINAT -->
+    <!-- CANTITATI -->
     <div class="card">
-      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
-        <div><div class="icon">🔌</div> ILUMINAT</div>
-        <button class="btn btn-secondary" onclick="adaugareRand('iluminat')" style="padding: 4px 8px; font-size:12px; margin-top:0;">➕ Add Item</button>
+      <div class="card-title"><div class="icon">🔢</div> Componente instalație</div>
+      
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. puncte luminoase</div>
+        <input class="price-input" type="number" id="v2-puncte" value="5" min="0">
       </div>
-      <div id="rows-iluminat"></div>
-    </div>
-    
-    <!-- MODUL TABLOU -->
-    <div class="card">
-      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
-        <div><div class="icon">⚡</div> TABLOU ELECTRIC</div>
-        <button class="btn btn-secondary" onclick="adaugareRand('tablou')" style="padding: 4px 8px; font-size:12px; margin-top:0;">➕ Add Item</button>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. prize simple</div>
+        <input class="price-input" type="number" id="v2-prize-simple" value="10" min="0">
       </div>
-      <div id="rows-tablou"></div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. prize duble</div>
+        <input class="price-input" type="number" id="v2-prize-duble" value="4" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. întrerupătoare</div>
+        <input class="price-input" type="number" id="v2-intrerupatoare" value="6" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. circuite dedicate</div>
+        <input class="price-input" type="number" id="v2-circuite" value="2" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. tablouri principale</div>
+        <input class="price-input" type="number" id="v2-tablouri" value="1" min="0">
+      </div>
     </div>
 
-    <!-- MODUL CIRCUITE -->
-    <div class="card">
+    <!-- MODUL LED -->
+    <div class="card" id="led-module">
       <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
-        <div><div class="icon">🔧</div> CIRCUITE GENERALE</div>
-        <button class="btn btn-secondary" onclick="adaugareRand('circuite')" style="padding: 4px 8px; font-size:12px; margin-top:0;">➕ Add Item</button>
+        <div><div class="icon">💡</div> Bandă LED (Manoperă)</div>
+        <button class="btn btn-secondary" onclick="adaugaLinieLED()" style="padding: 4px 8px; font-size:12px; margin-top:0;">➕ Add Bandă LED</button>
       </div>
-      <div id="rows-circuite"></div>
-    </div>
-
-    <!-- MODUL LOW CURRENT -->
-    <div class="card" style="margin-bottom: 24px;">
-      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
-        <div><div class="icon">🌐</div> CURENȚI SLABI / DATE</div>
-        <button class="btn btn-secondary" onclick="adaugareRand('low_current')" style="padding: 4px 8px; font-size:12px; margin-top:0;">➕ Add Item</button>
+      
+      <div id="led-rows-container">
+        <!-- Liniile se adaugă aici dinamic -->
       </div>
-      <div id="rows-low_current"></div>
+      
+      <div style="display:flex; justify-content:space-between; font-weight:bold; margin-top:12px; padding-top:8px; border-top:1px solid var(--border);">
+        <div>Total Bandă LED:</div>
+        <div id="led-total-vizual">0 lei</div>
+      </div>
+      
+      <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-top: 16px; margin-bottom: 24px; width:100%; height: 48px; font-size:16px;">🧮 Calculează Deviz</button>
     </div>
-
-    <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-bottom: 24px; width:100%; height: 48px; font-size:16px;">🧮 Calculează Deviz</button>
 
     <!-- REZULTAT V2 -->
     <div class="result-panel" id="v2-rezultat-panel" style="display:none;">
@@ -798,6 +809,7 @@ const DEFAULT_PRICES = {
   'retea-date': { name: 'Punct rețea date / internet', unit: 'buc', price: 80, hasQty: true },
   'deplasare': { name: 'Deplasare / transport', unit: 'set', price: 100, hasQty: false },
   // iluminat
+  'pct_lumina_s': { name: 'Punct lumină simplu', unit: 'buc', price: 80 },
   'il_gen': { name: 'Circuit iluminat general', unit: 'circuit', price: 150 },
   'il_led_basic': { name: 'Bandă LED BASIC', unit: 'ml', price: 32.5 },
   'il_led_std': { name: 'Bandă LED STANDARD', unit: 'ml', price: 55 },
@@ -809,6 +821,7 @@ const DEFAULT_PRICES = {
   'tb_reorg': { name: 'Reorganizare tablou existent', unit: 'set', price: 400 },
   'tb_eticheta': { name: 'Etichetare circuite', unit: 'tablou', price: 85 },
   // circuite v2
+  'cab_mp': { name: 'Cablare pe mp', unit: 'mp', price: 50 },
   'circ_prize': { name: 'Circuit prize general', unit: 'circuit', price: 150 },
   'circ_iluminat': { name: 'Circuit iluminat general', unit: 'circuit', price: 125 },
   'circ_bucatarie': { name: 'Circuit bucătărie general', unit: 'circuit', price: 200 },
@@ -823,9 +836,9 @@ const DEFAULT_PRICES = {
 };
 
 const PRICE_GROUPS = {
-  iluminat: ['il_gen','il_led_basic','il_led_std','il_led_prem','il_led_cx'],
+  iluminat: ['pct_lumina_s','il_gen','il_led_basic','il_led_std','il_led_prem','il_led_cx'],
   tablou: ['tb_mcb','tb_rcd','tb_reorg','tb_eticheta'],
-  circuite_v2: ['circ_prize','circ_iluminat','circ_bucatarie','pct_priza_s','pct_priza_d','pct_intrerup'],
+  circuite_v2: ['cab_mp','circ_prize','circ_iluminat','circ_bucatarie','pct_priza_s','pct_priza_d','pct_intrerup'],
   low_current: ['lc_tv','lc_rj45','lc_interfon','lc_smart']
 };
 
@@ -854,15 +867,7 @@ function init() {
     if (el) toggleState[k] = el.classList.contains('on');
   });
 
-  // Sincronizare preturi in BUILDER_DATA
-  Object.keys(BUILDER_DATA).forEach(cat => {
-    BUILDER_DATA[cat].forEach(item => {
-      if (prices[item.id]) {
-        item.price = prices[item.id].price;
-      }
-    });
-  });
-
+  // init
   buildPriceEditor();
   updatePriceLabels();
   calcAll();
@@ -1062,14 +1067,13 @@ function buildPriceEditor() {
 function updatePrice(key, val) {
   prices[key].price = parseFloat(val) || 0;
   
-  // Update in BUILDER_DATA daca exista
-  for (let cat in BUILDER_DATA) {
-    let item = BUILDER_DATA[cat].find(i => i.id === key);
-    if (item) item.price = prices[key].price;
-  }
-  
   updatePriceLabels();
   calcAll();
+  
+  // Re-randam si benzile LED in V2 daca sunt incarcate
+  if (typeof updateLiniiLED === 'function') {
+    updateLiniiLED();
+  }
 }
 
 function savePrices() {
@@ -1293,100 +1297,16 @@ function switchVersion(ver) {
   }
 }
 
-const BUILDER_DATA = {
-  iluminat: [
-    { id: "il_gen", desc: "Circuit iluminat general", price: 150, unit: "circuit" },
-    { id: "il_led_basic", desc: "Bandă LED BASIC", price: 32.5, unit: "ml" },
-    { id: "il_led_std", desc: "Bandă LED STANDARD", price: 55, unit: "ml" },
-    { id: "il_led_prem", desc: "Bandă LED PREMIUM", price: 100, unit: "ml" },
-    { id: "il_led_cx", desc: "Bandă LED COMPLEX", price: 150, unit: "ml" }
-  ],
-  tablou: [
-    { id: "tb_mcb", desc: "Siguranță automată (MCB)", price: 35, unit: "buc" },
-    { id: "tb_rcd", desc: "Diferențială (RCD)", price: 130, unit: "buc" },
-    { id: "tb_reorg", desc: "Reorganizare tablou existent", price: 400, unit: "set" },
-    { id: "tb_eticheta", desc: "Etichetare circuite", price: 85, unit: "tablou" }
-  ],
-  circuite: [
-    { id: "circ_prize", desc: "Circuit prize general", price: 150, unit: "circuit" },
-    { id: "circ_iluminat", desc: "Circuit iluminat general", price: 125, unit: "circuit" },
-    { id: "circ_bucatarie", desc: "Circuit bucătărie general", price: 200, unit: "circuit" },
-    { id: "pct_priza_s", desc: "Punct priză simplă", price: 70, unit: "buc" },
-    { id: "pct_priza_d", desc: "Punct priză dublă", price: 85, unit: "buc" },
-    { id: "pct_intrerup", desc: "Punct întrerupător", price: 60, unit: "buc" }
-  ],
-  low_current: [
-    { id: "lc_tv", desc: "Cablu TV coaxial", price: 80, unit: "punct" },
-    { id: "lc_rj45", desc: "Cablu rețea RJ45", price: 95, unit: "punct" },
-    { id: "lc_interfon", desc: "Interfon / sonerie", price: 115, unit: "punct" },
-    { id: "lc_smart", desc: "Pregătire smart home", price: 150, unit: "punct" }
+const PRICING_DATA_V2 = {
+  items: [
+    { code: "POINT_LIGHT_SIMPLE", price_id: "pct_lumina_s", unit: "buc", description: "Punct lumină simplu" },
+    { code: "SOCKET_SINGLE", price_id: "pct_priza_s", unit: "buc", description: "Priză simplă" },
+    { code: "SOCKET_DOUBLE", price_id: "pct_priza_d", unit: "buc", description: "Priză dublă" },
+    { code: "SWITCH_SINGLE", price_id: "pct_intrerup", unit: "buc", description: "Întrerupător simplu" },
+    { code: "CIRCUIT_DEDICATED", price_id: "circ_prize", unit: "buc", description: "Circuit dedicat" },
+    { code: "TABLOU_MAIN", price_id: "tb_reorg", unit: "buc", description: "Tablou principal" }
   ]
 };
-
-let builderRowCounter = 0;
-
-function adaugareRand(categorie) {
-  builderRowCounter++;
-  const id = builderRowCounter;
-  
-  const container = document.getElementById(`rows-${categorie}`);
-  const items = BUILDER_DATA[categorie];
-  
-  let optionsHtml = '';
-  items.forEach(item => {
-    optionsHtml += `<option value="${item.price}" data-unit="${item.unit}" data-desc="${item.desc}">${item.desc} (${item.price} lei/${item.unit})</option>`;
-  });
-  
-  const row = document.createElement('div');
-  row.className = 'builder-row';
-  row.id = `builder-row-${id}`;
-  row.style = 'display:flex; gap:8px; align-items:center; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed var(--border);';
-  
-  row.innerHTML = `
-    <div style="flex:2;">
-      <select class="input row-tip" onchange="updateRow(${id})" style="font-size:12px; padding:4px;">
-        ${optionsHtml}
-      </select>
-    </div>
-    <div style="flex:1; display:flex; align-items:center; gap:4px;">
-      <input type="number" class="input row-qty" value="1" min="0" oninput="updateRow(${id})" style="font-size:12px; padding:4px;" placeholder="Cant.">
-      <span class="row-unit" style="font-size:11px; color:var(--text3);">${items[0].unit}</span>
-    </div>
-    <div style="flex:1; text-align:right; font-size:12px; font-weight:bold;" class="row-total">
-      ${items[0].price} lei
-    </div>
-    <div>
-      <button class="btn btn-danger" onclick="stergeRand(${id})" style="padding:4px 8px; font-size:12px; margin-top:0;">🗑</button>
-    </div>
-  `;
-  
-  container.appendChild(row);
-}
-
-function updateRow(id) {
-  const row = document.getElementById(`builder-row-${id}`);
-  if (!row) return;
-  
-  const selectEl = row.querySelector('.row-tip');
-  const qtyEl = row.querySelector('.row-qty');
-  const unitEl = row.querySelector('.row-unit');
-  const totalEl = row.querySelector('.row-total');
-  
-  const selectedOption = selectEl.options[selectEl.selectedIndex];
-  const pret = parseFloat(selectedOption.value) || 0;
-  const unit = selectedOption.getAttribute('data-unit');
-  const qty = parseFloat(qtyEl.value) || 0;
-  
-  unitEl.textContent = unit;
-  totalEl.textContent = Math.round(pret * qty) + ' lei';
-}
-
-function stergeRand(id) {
-  const row = document.getElementById(`builder-row-${id}`);
-  if (row) {
-    row.remove();
-  }
-}
 
 function calculeazaV2() {
   const suprafata = parseInt(document.getElementById('v2-suprafata').value) || 0;
@@ -1395,61 +1315,96 @@ function calculeazaV2() {
   const coefPereti = parseFloat(document.getElementById('v2-dificultate-pereti').value) || 1.0;
   const coefAcces = parseFloat(document.getElementById('v2-acces').value) || 1.0;
   
+  // Qty mapping
+  const qtys = {
+    "POINT_LIGHT_SIMPLE": parseInt(document.getElementById('v2-puncte').value) || 0,
+    "SOCKET_SINGLE": parseInt(document.getElementById('v2-prize-simple').value) || 0,
+    "SOCKET_DOUBLE": parseInt(document.getElementById('v2-prize-duble').value) || 0,
+    "SWITCH_SINGLE": parseInt(document.getElementById('v2-intrerupatoare').value) || 0,
+    "CIRCUIT_DEDICATED": parseInt(document.getElementById('v2-circuite').value) || 0,
+    "TABLOU_MAIN": parseInt(document.getElementById('v2-tablouri').value) || 0
+  };
+
   let totalBaza = 0;
   let html = '';
   
-  // Procesam cablarea generala separat
+  // Cablare generala mp
   if (suprafata > 0) {
-    const sub = suprafata * 50; // Manopera baza mp
+    let pret_mp = 50; 
+    if (prices['cab_mp']) pret_mp = prices['cab_mp'].price;
+    const sub = suprafata * pret_mp;
     totalBaza += sub;
     html += `
         <tr style="border-bottom: 1px solid var(--border);">
-          <td style="padding: 8px 4px;">Cablare generală (Bază)</td>
+          <td style="padding: 8px 4px;">Cablare generală</td>
           <td style="padding: 8px 4px; color:var(--text3);">mp</td>
           <td style="padding: 8px 4px; text-align:center;">${suprafata}</td>
-          <td style="padding: 8px 4px; text-align:right;">50 lei</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(pret_mp)} lei</td>
           <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub)} lei</td>
         </tr>
       `;
   }
-
-  const allRows = document.querySelectorAll('.builder-row');
   
-  allRows.forEach(row => {
-    const selectEl = row.querySelector('.row-tip');
-    const qtyEl = row.querySelector('.row-qty');
-    
-    const selectedOption = selectEl.options[selectEl.selectedIndex];
-    const pret = parseFloat(selectedOption.value) || 0;
-    const desc = selectedOption.getAttribute('data-desc');
-    const unit = selectedOption.getAttribute('data-unit');
-    const qty = parseFloat(qtyEl.value) || 0;
-    
-    if (qty > 0) {
-      const sub = pret * qty;
+  PRICING_DATA_V2.items.forEach(item => {
+    const q = qtys[item.code];
+    if (q > 0) {
+      let man = 0;
+      if (prices[item.price_id]) {
+        man = prices[item.price_id].price;
+      }
+      const sub = man * q;
       totalBaza += sub;
       
       html += `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 8px 4px;">${item.description}</td>
+          <td style="padding: 8px 4px; color:var(--text3);">${item.unit}</td>
+          <td style="padding: 8px 4px; text-align:center;">${q}</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(man)} lei</td>
+          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub)} lei</td>
+        </tr>
+      `;
+    }
+  });
+
+  // Procesare LED separat dinamic
+  const ledRows = document.querySelectorAll('.led-row');
+  let totalLedSub = 0;
+  
+  ledRows.forEach(row => {
+    const tipEl = row.querySelector('.led-tip');
+    const mlEl = row.querySelector('.led-ml');
+    
+    const price_id = tipEl.value;
+    const pret = prices[price_id] ? prices[price_id].price : 0;
+    const ml = parseFloat(mlEl.value) || 0;
+    const descOption = tipEl.options[tipEl.selectedIndex].text.split(' - ')[0] || 'Bandă LED';
+    
+    if (ml > 0) {
+      const subLed = pret * ml;
+      totalLedSub += subLed;
+      
+      html += `
           <tr style="border-bottom: 1px solid var(--border);">
-            <td style="padding: 8px 4px;">${desc}</td>
-            <td style="padding: 8px 4px; color:var(--text3);">${unit}</td>
-            <td style="padding: 8px 4px; text-align:center;">${qty}</td>
+            <td style="padding: 8px 4px;">Montaj ${descOption}</td>
+            <td style="padding: 8px 4px; color:var(--text3);">ml</td>
+            <td style="padding: 8px 4px; text-align:center;">${ml}</td>
             <td style="padding: 8px 4px; text-align:right;">${Math.round(pret)} lei</td>
-            <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub)} lei</td>
+            <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(subLed)} lei</td>
           </tr>
         `;
     }
   });
+  
+  totalBaza += totalLedSub;
   
   const coefTotal = coefLucrare * coefPereti * coefAcces;
   const totalGeneral = totalBaza * coefTotal;
   
   document.getElementById('v2-tabel-body').innerHTML = html;
   
-  // Reset panou rezultat
   document.getElementById('v2-total-general').textContent = Math.round(totalGeneral).toLocaleString('ro-RO') + ' lei';
   
-  // Afisam detaliile coeficientilor in breakdown
   const breakdownHtml = `
     <div>
       <div class="result-label" style="font-size:10px;">Subtotal bază</div>
@@ -1464,6 +1419,80 @@ function calculeazaV2() {
   
   document.getElementById('v2-tabel-card').style.display = 'block';
   document.getElementById('v2-rezultat-panel').style.display = 'block';
+}
+
+// ====== LOGICA LED ======
+let ledRowCounter = 0;
+
+function adaugaLinieLED() {
+  ledRowCounter++;
+  const id = ledRowCounter;
+  
+  const container = document.getElementById('led-rows-container');
+  const row = document.createElement('div');
+  row.className = 'led-row';
+  row.id = `led-row-${id}`;
+  row.style = 'display:flex; gap:8px; align-items:center; margin-top:8px; padding-bottom:8px; border-bottom:1px dashed var(--border);';
+  
+  const p_basic = prices['il_led_basic'] ? prices['il_led_basic'].price : 32.5;
+  const p_std = prices['il_led_std'] ? prices['il_led_std'].price : 55;
+  const p_prem = prices['il_led_prem'] ? prices['il_led_prem'].price : 100;
+  const p_cx = prices['il_led_cx'] ? prices['il_led_cx'].price : 150;
+  
+  row.innerHTML = `
+    <div style="flex:2;">
+      <select class="input led-tip" onchange="updateLiniiLED()" style="font-size:12px; padding:4px;">
+        <option value="il_led_basic">BASIC - Simplă (${p_basic} lei)</option>
+        <option value="il_led_std" selected>STANDARD - Profil (${p_std} lei)</option>
+        <option value="il_led_prem">PREMIUM - RGB/Smart (${p_prem} lei)</option>
+        <option value="il_led_cx">COMPLEX - Scări/Tavane (${p_cx} lei)</option>
+      </select>
+    </div>
+    <div style="flex:1;">
+      <input type="number" class="input led-ml" value="1" min="0" oninput="updateLiniiLED()" style="font-size:12px; padding:4px;" placeholder="ml">
+    </div>
+    <div style="flex:1; text-align:right; font-size:12px; font-weight:bold;" class="led-row-total">
+      ${p_std} lei
+    </div>
+    <div>
+      <button class="btn btn-danger" onclick="stergeLinieLED(${id})" style="padding:4px 8px; font-size:12px; margin-top:0;">🗑</button>
+    </div>
+  `;
+  
+  container.appendChild(row);
+  updateLiniiLED();
+}
+
+function stergeLinieLED(id) {
+  const row = document.getElementById(`led-row-${id}`);
+  if (row) {
+    row.remove();
+    updateLiniiLED();
+  }
+}
+
+function updateLiniiLED() {
+  const rows = document.querySelectorAll('.led-row');
+  let totalLed = 0;
+  
+  rows.forEach(row => {
+    const tipEl = row.querySelector('.led-tip');
+    const mlEl = row.querySelector('.led-ml');
+    const totalEl = row.querySelector('.led-row-total');
+    
+    const price_id = tipEl.value;
+    const pret = prices[price_id] ? prices[price_id].price : 0;
+    const ml = parseFloat(mlEl.value) || 0;
+    const subtot = pret * ml;
+    
+    totalEl.textContent = Math.round(subtot) + ' lei';
+    totalLed += subtot;
+  });
+  
+  const totalVizualEl = document.getElementById('led-total-vizual');
+  if(totalVizualEl) {
+    totalVizualEl.textContent = Math.round(totalLed) + ' lei';
+  }
 }
 
 // ====== START ======
