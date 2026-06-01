@@ -1353,11 +1353,9 @@ function resetCalc() {
   Object.keys(DEFAULT_PRICES).forEach(key => {
     const btn = document.getElementById('tog-' + key);
     if (!btn) return;
-    const defaults = ['tablou','cablare-mp','prize','intrerupatoare','corpuri-iluminat'];
-    const on = defaults.includes(key);
-    btn.classList.toggle('on', on);
-    btn.classList.toggle('off', !on);
-    toggleState[key] = on;
+    btn.classList.toggle('on', false);
+    btn.classList.toggle('off', true);
+    toggleState[key] = false;
   });
 
   calcAll();
