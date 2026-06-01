@@ -639,7 +639,12 @@
         <div id="led-total-vizual">0 lei</div>
       </div>
       
-      <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-top: 16px; margin-bottom: 12px; width:100%; height: 48px; font-size:16px;">🧮 Calculează Deviz</button>
+      <div class="price-row" style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; margin-bottom: 12px;">
+        <div class="price-row-name" style="color: var(--accent);">🏷️ Discount aplicat (%)</div>
+        <input class="price-input" type="number" id="v2-discount" value="0" min="0" max="100">
+      </div>
+      
+      <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-top: 8px; margin-bottom: 12px; width:100%; height: 48px; font-size:16px;">🧮 Calculează Deviz</button>
       
       <div style="border-top:1px solid var(--border); padding-top:16px; margin-bottom: 24px;">
         <input type="text" id="v2-client-name" class="input" placeholder="Nume client / proiect (opțional)" style="margin-bottom:8px;">
@@ -1025,6 +1030,7 @@ function saveQuoteV2() {
     dificultatePereti: document.getElementById('v2-dificultate-pereti').value,
     acces: document.getElementById('v2-acces').value,
     suprafata: suprafata,
+    discount: document.getElementById('v2-discount').value,
     qtys: {
       "POINT_LIGHT_SIMPLE": document.getElementById('v2-puncte').value,
       "SOCKET_SINGLE": document.getElementById('v2-prize-simple').value,
@@ -1137,6 +1143,7 @@ function generatePDF(i, skipReload = false) {
     document.getElementById('v2-dificultate-pereti').value = q.state.dificultatePereti || '1.0';
     document.getElementById('v2-acces').value = q.state.acces || '1.0';
     document.getElementById('v2-suprafata').value = q.state.suprafata || '0';
+    document.getElementById('v2-discount').value = q.state.discount || '0';
     
     if (q.state.qtys) {
       document.getElementById('v2-puncte').value = q.state.qtys["POINT_LIGHT_SIMPLE"] || 0;
@@ -1214,10 +1221,19 @@ function generatePDF(i, skipReload = false) {
     </div>
     
     <div style="margin-top:20px; border-top: 2px solid #3498db; padding-top:20px; display:flex; justify-content:flex-end;">
+      ${ (parseFloat(q.state.discount) || 0) > 0 ? `
+      <div style="text-align:right;">
+        <div style="font-size:14px; color:#555; margin-bottom:5px;">Subtotal estimat manoperă: ${Math.round(parseInt(grandTotal.replace(/\\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))).toLocaleString('ro-RO')} lei</div>
+        <div style="font-size:14px; color:#e74c3c; margin-bottom:10px;">Discount aplicat (${parseFloat(q.state.discount)}%): -${(Math.round(parseInt(grandTotal.replace(/\\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))) - parseInt(grandTotal.replace(/\\D/g, ''))).toLocaleString('ro-RO')} lei</div>
+        <h2 style="margin:0; color:#2c3e50;">TOTAL FINAL MANOPERĂ</h2>
+        <h1 style="margin:10px 0 0 0; color:#e74c3c;">${grandTotal}</h1>
+      </div>
+      ` : `
       <div style="text-align:right;">
         <h2 style="margin:0; color:#2c3e50;">TOTAL ESTIMAT MANOPERĂ</h2>
         <h1 style="margin:10px 0 0 0; color:#e74c3c;">${grandTotal}</h1>
       </div>
+      `}
     </div>
     
     <div style="margin-top:50px; font-size:12px; color:#7f8c8d; text-align:center; padding-top:20px; border-top:1px solid #eee;">
@@ -1593,13 +1609,20 @@ function calculeazaV2() {
   totalBaza += totalLedSub;
   
   const coefTotal = coefLucrare * coefPereti * coefAcces;
-  const totalGeneral = totalBaza * coefTotal;
+  let totalGeneral = totalBaza * coefTotal;
+  
+  const discountPercent = parseFloat(document.getElementById('v2-discount').value) || 0;
+  let discountAmount = 0;
+  if (discountPercent > 0) {
+    discountAmount = totalGeneral * (discountPercent / 100);
+    totalGeneral -= discountAmount;
+  }
   
   document.getElementById('v2-tabel-body').innerHTML = html;
   
   document.getElementById('v2-total-general').textContent = Math.round(totalGeneral).toLocaleString('ro-RO') + ' lei';
   
-  const breakdownHtml = `
+  let breakdownHtml = `
     <div>
       <div class="result-label" style="font-size:10px;">Subtotal bază</div>
       <div style="font-size:16px; font-weight:700; color:var(--text);">${Math.round(totalBaza).toLocaleString('ro-RO')} lei</div>
@@ -1609,6 +1632,16 @@ function calculeazaV2() {
       <div style="font-size:16px; font-weight:700; color:var(--text);">x${coefTotal.toFixed(2)}</div>
     </div>
   `;
+  
+  if (discountPercent > 0) {
+    breakdownHtml += `
+    <div>
+      <div class="result-label" style="font-size:10px;">Discount aplicat (${discountPercent}%)</div>
+      <div style="font-size:16px; font-weight:700; color:var(--red);">-${Math.round(discountAmount).toLocaleString('ro-RO')} lei</div>
+    </div>
+    `;
+  }
+  
   document.getElementById('v2-result-breakdown').innerHTML = breakdownHtml;
   
   document.getElementById('v2-tabel-card').style.display = 'block';
@@ -1620,6 +1653,7 @@ function resetCalculatorV2() {
   document.getElementById('v2-dificultate-pereti').value = "1.0";
   document.getElementById('v2-acces').value = "1.0";
   document.getElementById('v2-suprafata').value = "0";
+  document.getElementById('v2-discount').value = "0";
   
   document.getElementById('v2-puncte').value = "0";
   document.getElementById('v2-prize-simple').value = "0";
