@@ -887,35 +887,10 @@ function init() {
 
   // init
   buildPriceEditor();
-  let compRowCounter = 0;
-function adaugaLinieComponenta() {
-  compRowCounter++;
-  const id = compRowCounter;
-  
-  let options = '';
-  Object.keys(prices).forEach(key => {
-    if (!key.startsWith('il_led_')) {
-      options += `<option value="${key}">${prices[key].name} (${prices[key].unit}) - ${prices[key].price} lei</option>`;
-    }
-  });
-
-  const rowHtml = `
-    <div class="price-row extra-comp-row" id="comp-row-${id}" style="padding: 6px 0; display:flex; gap:8px; align-items:center; border-bottom: 1px dashed var(--border);">
-      <select class="input comp-tip" onchange="calculeazaV2()" style="flex:2; height:32px; padding:4px; font-size:12px;">
-        ${options}
-      </select>
-      <input class="price-input comp-qty" type="number" value="1" min="1" oninput="calculeazaV2()" style="flex:1; max-width:60px; font-size:12px;">
-      <button class="btn btn-danger" onclick="document.getElementById('comp-row-${id}').remove(); calculeazaV2();" style="padding:4px 8px; margin:0;"><div class="icon" style="margin:0;">🗑</div></button>
-    </div>
-  `;
-  document.getElementById('extra-comps-container').insertAdjacentHTML('beforeend', rowHtml);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderPrices();
+  updatePriceLabels();
+  calcAll();
   renderQuotes();
-});
-</script>
+}
 
 // ====== TABS ======
 function switchTab(tab) {
@@ -1886,6 +1861,31 @@ function updateLiniiLED() {
   if(totalVizualEl) {
     totalVizualEl.textContent = Math.round(totalLed) + ' lei';
   }
+}
+
+// ====== EXTRA COMPONENTS ======
+let compRowCounter = 0;
+function adaugaLinieComponenta() {
+  compRowCounter++;
+  const id = compRowCounter;
+  
+  let options = '';
+  Object.keys(prices).forEach(key => {
+    if (!key.startsWith('il_led_')) {
+      options += `<option value="${key}">${prices[key].name} (${prices[key].unit}) - ${prices[key].price} lei</option>`;
+    }
+  });
+
+  const rowHtml = `
+    <div class="price-row extra-comp-row" id="comp-row-${id}" style="padding: 6px 0; display:flex; gap:8px; align-items:center; border-bottom: 1px dashed var(--border);">
+      <select class="input comp-tip" onchange="calculeazaV2()" style="flex:2; height:32px; padding:4px; font-size:12px;">
+        ${options}
+      </select>
+      <input class="price-input comp-qty" type="number" value="1" min="1" oninput="calculeazaV2()" style="flex:1; max-width:60px; font-size:12px;">
+      <button class="btn btn-danger" onclick="document.getElementById('comp-row-${id}').remove(); calculeazaV2();" style="padding:4px 8px; margin:0;"><div class="icon" style="margin:0;">🗑</div></button>
+    </div>
+  `;
+  document.getElementById('extra-comps-container').insertAdjacentHTML('beforeend', rowHtml);
 }
 
 // ====== START ======
