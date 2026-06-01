@@ -1011,6 +1011,18 @@
   <div class="section-sub">Modifică tarifele după zona ta</div>
 
   <div class="card">
+    <div class="card-title"><div class="icon">📈</div> Modificare procentuală globală</div>
+    <div class="input-row" style="align-items: flex-end;">
+      <div class="field" style="margin-bottom:0">
+        <label class="label">Ajustează procentual (%)</label>
+        <input class="input" type="number" id="globalPercent" placeholder="ex: 15 sau -10">
+      </div>
+      <button class="btn btn-primary" onclick="applyGlobalPercent()" style="height: 44px; padding: 0;">Aplică</button>
+    </div>
+    <div style="font-size: 11px; color: var(--text3); margin-top: 6px;">Ex: "10" pentru o creștere de 10%, "-10" pentru o scădere de 10%. Nu uita să salvezi la final.</div>
+  </div>
+
+  <div class="card">
     <div class="card-title"><div class="icon">⚡</div> Instalație de bază</div>
     <div id="price-editor-base"></div>
   </div>
@@ -1339,6 +1351,22 @@ function resetPrices() {
 }
 
 // ====== RESET CALC ======
+function applyGlobalPercent() {
+  const percent = parseFloat(document.getElementById('globalPercent').value);
+  if (isNaN(percent) || percent === 0) return;
+  
+  const multiplier = 1 + (percent / 100);
+  Object.keys(prices).forEach(key => {
+    prices[key].price = Math.round(prices[key].price * multiplier);
+  });
+  
+  buildPriceEditor();
+  updatePriceLabels();
+  calcAll();
+  showToast(`📈 Prețuri ajustate cu ${percent > 0 ? '+' : ''}${percent}%`);
+  document.getElementById('globalPercent').value = '';
+}
+
 function resetCalc() {
   document.getElementById('clientName').value = '';
   document.getElementById('suprafata').value = '60';
