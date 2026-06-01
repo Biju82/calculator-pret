@@ -684,7 +684,7 @@
             <th style="padding:8px 4px;">U.M.</th>
             <th style="padding:8px 4px; text-align:center;">Cant.</th>
             <th style="padding:8px 4px; text-align:right;">Preț Unitar</th>
-            <th style="padding:8px 4px; text-align:right; color:var(--text);">Subtotal (bază)</th>
+            <th style="padding:8px 4px; text-align:right; color:var(--text);">Subtotal</th>
           </tr>
         </thead>
         <tbody id="v2-tabel-body">
@@ -1292,7 +1292,7 @@ function generatePDF(i, skipReload = false) {
           <th style="padding: 12px; text-align:center;">U.M.</th>
           <th style="padding: 12px; text-align:center;">Cantitate</th>
           <th style="padding: 12px; text-align:right;">Preț Unitar</th>
-          <th style="padding: 12px; text-align:right;">Subtotal (bază)</th>
+          <th style="padding: 12px; text-align:right;">Subtotal</th>
         </tr>
       </thead>
       <tbody>
@@ -1300,9 +1300,7 @@ function generatePDF(i, skipReload = false) {
       </tbody>
     </table>
     
-    <div style="margin-top:20px; text-align:right; font-size:12px; color:#555;">
-      <em>* Subtotalurile de bază nu includ coeficienții de dificultate de pe șantier.</em>
-    </div>
+
     
     <div style="margin-top:20px; border-top: 2px solid #3498db; padding-top:20px; display:flex; justify-content:flex-end;">
       ${ (parseFloat(q.state.discount) || 0) > 0 ? `
@@ -1610,6 +1608,7 @@ function calculeazaV2() {
   const coefLucrare = parseFloat(document.getElementById('v2-tip-lucrare').value) || 1.0;
   const coefPereti = parseFloat(document.getElementById('v2-dificultate-pereti').value) || 1.0;
   const coefAcces = parseFloat(document.getElementById('v2-acces').value) || 1.0;
+  const coefTotal = coefLucrare * coefPereti * coefAcces;
   
   // Qty mapping
   const qtys = {
@@ -1644,8 +1643,8 @@ function calculeazaV2() {
           <td style="padding: 8px 4px;">Cablare generală</td>
           <td style="padding: 8px 4px; color:var(--text3);">mp</td>
           <td style="padding: 8px 4px; text-align:center;">${suprafata}</td>
-          <td style="padding: 8px 4px; text-align:right;">${Math.round(pret_mp)} lei</td>
-          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub)} lei</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(pret_mp * coefTotal)} lei</td>
+          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub * coefTotal)} lei</td>
         </tr>
       `;
   }
@@ -1665,8 +1664,8 @@ function calculeazaV2() {
           <td style="padding: 8px 4px;">${item.description}</td>
           <td style="padding: 8px 4px; color:var(--text3);">${item.unit}</td>
           <td style="padding: 8px 4px; text-align:center;">${q}</td>
-          <td style="padding: 8px 4px; text-align:right;">${Math.round(man)} lei</td>
-          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub)} lei</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(man * coefTotal)} lei</td>
+          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub * coefTotal)} lei</td>
         </tr>
       `;
     }
@@ -1694,8 +1693,8 @@ function calculeazaV2() {
             <td style="padding: 8px 4px;">LED Montaj ${descOption}</td>
             <td style="padding: 8px 4px; color:var(--text3);">ml</td>
             <td style="padding: 8px 4px; text-align:center;">${ml}</td>
-            <td style="padding: 8px 4px; text-align:right;">${Math.round(pret)} lei</td>
-            <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(subLed)} lei</td>
+            <td style="padding: 8px 4px; text-align:right;">${Math.round(pret * coefTotal)} lei</td>
+            <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(subLed * coefTotal)} lei</td>
           </tr>
         `;
     }
@@ -1711,16 +1710,14 @@ function calculeazaV2() {
           <td style="padding: 8px 4px;">${prices[comp.tip].name}</td>
           <td style="padding: 8px 4px; color:var(--text3);">${prices[comp.tip].unit}</td>
           <td style="padding: 8px 4px; text-align:center;">${comp.qty}</td>
-          <td style="padding: 8px 4px; text-align:right;">${Math.round(prices[comp.tip].price)} lei</td>
-          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(linePrice)} lei</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(prices[comp.tip].price * coefTotal)} lei</td>
+          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(linePrice * coefTotal)} lei</td>
         </tr>
       `;
     }
   });
   
   totalBaza += totalLedSub + extraCompsTotal;
-  
-  const coefTotal = coefLucrare * coefPereti * coefAcces;
   let totalGeneral = totalBaza * coefTotal;
   
   const discountPercent = parseFloat(document.getElementById('v2-discount').value) || 0;
