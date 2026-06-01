@@ -1223,8 +1223,8 @@ function generatePDF(i, skipReload = false) {
     <div style="margin-top:20px; border-top: 2px solid #3498db; padding-top:20px; display:flex; justify-content:flex-end;">
       ${ (parseFloat(q.state.discount) || 0) > 0 ? `
       <div style="text-align:right;">
-        <div style="font-size:14px; color:#555; margin-bottom:5px;">Subtotal estimat manoperă: ${Math.round(parseInt(grandTotal.replace(/\\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))).toLocaleString('ro-RO')} lei</div>
-        <div style="font-size:14px; color:#e74c3c; margin-bottom:10px;">Discount aplicat (${parseFloat(q.state.discount)}%): -${(Math.round(parseInt(grandTotal.replace(/\\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))) - parseInt(grandTotal.replace(/\\D/g, ''))).toLocaleString('ro-RO')} lei</div>
+        <div style="font-size:14px; color:#555; margin-bottom:5px;">Subtotal estimat manoperă: ${Math.round(parseInt(grandTotal.replace(/\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))).toLocaleString('ro-RO')} lei</div>
+        <div style="font-size:14px; color:#e74c3c; margin-bottom:10px;">Discount aplicat (${parseFloat(q.state.discount)}%): -${(Math.round(parseInt(grandTotal.replace(/\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))) - parseInt(grandTotal.replace(/\D/g, ''))).toLocaleString('ro-RO')} lei</div>
         <h2 style="margin:0; color:#2c3e50;">TOTAL FINAL MANOPERĂ</h2>
         <h1 style="margin:10px 0 0 0; color:#e74c3c;">${grandTotal}</h1>
       </div>
@@ -1245,7 +1245,7 @@ function generatePDF(i, skipReload = false) {
   
   var opt = {
     margin:       [0.5, 0.5, 0.5, 0.5],
-    filename:     `Oferta_${clientName.replace(/\\s+/g, '_')}.pdf`,
+    filename:     `Oferta_${clientName.replace(/\s+/g, '_')}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
     html2canvas:  { scale: 2 },
     jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
