@@ -1107,7 +1107,7 @@ function loadQuote(i) {
   const clientNameEl = document.getElementById('v2-client-name');
   if (clientNameEl) clientNameEl.value = (q.client === 'Deviz Nou' || q.client === 'Deviz Dinamic') ? '' : q.client;
   
-  showTab('calculator');
+  switchTab('calculator');
   calculeazaV2();
   showToast('📂 Deviz încărcat cu succes!');
 }
