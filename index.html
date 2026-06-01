@@ -629,6 +629,8 @@
           <input class="price-input" type="number" id="v2-tablou-qty" value="1" min="0" style="width: 60px;">
         </div>
       </div>
+      <div id="extra-comps-container" style="margin-top: 16px;"></div>
+      <button class="btn btn-secondary" onclick="adaugaLinieComponenta()" style="margin-top: 8px; width: 100%; justify-content: center; font-size: 13px; padding: 8px;">➕ Adaugă componentă extra din listă</button>
     </div>
 
     <!-- MODUL LED -->
@@ -885,10 +887,35 @@ function init() {
 
   // init
   buildPriceEditor();
-  updatePriceLabels();
-  calcAll();
-  renderQuotes();
+  let compRowCounter = 0;
+function adaugaLinieComponenta() {
+  compRowCounter++;
+  const id = compRowCounter;
+  
+  let options = '';
+  Object.keys(prices).forEach(key => {
+    if (!key.startsWith('il_led_')) {
+      options += `<option value="${key}">${prices[key].name} (${prices[key].unit}) - ${prices[key].price} lei</option>`;
+    }
+  });
+
+  const rowHtml = `
+    <div class="price-row extra-comp-row" id="comp-row-${id}" style="padding: 6px 0; display:flex; gap:8px; align-items:center; border-bottom: 1px dashed var(--border);">
+      <select class="input comp-tip" onchange="calculeazaV2()" style="flex:2; height:32px; padding:4px; font-size:12px;">
+        ${options}
+      </select>
+      <input class="price-input comp-qty" type="number" value="1" min="1" oninput="calculeazaV2()" style="flex:1; max-width:60px; font-size:12px;">
+      <button class="btn btn-danger" onclick="document.getElementById('comp-row-${id}').remove(); calculeazaV2();" style="padding:4px 8px; margin:0;"><div class="icon" style="margin:0;">🗑</div></button>
+    </div>
+  `;
+  document.getElementById('extra-comps-container').insertAdjacentHTML('beforeend', rowHtml);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderPrices();
+  renderQuotes();
+});
+</script>
 
 // ====== TABS ======
 function switchTab(tab) {
@@ -1050,6 +1077,10 @@ function saveQuoteV2() {
     leds: Array.from(document.querySelectorAll('.led-row')).map(row => ({
       tip: row.querySelector('.led-tip').value,
       ml: row.querySelector('.led-ml').value
+    })),
+    extraComps: Array.from(document.querySelectorAll('.extra-comp-row')).map(row => ({
+      tip: row.querySelector('.comp-tip').value,
+      qty: row.querySelector('.comp-qty').value
     }))
   };
 
@@ -1144,6 +1175,19 @@ function loadQuote(i) {
     });
   }
   
+  document.getElementById('extra-comps-container').innerHTML = '';
+  compRowCounter = 0;
+  if (q.state.extraComps && q.state.extraComps.length > 0) {
+    q.state.extraComps.forEach(comp => {
+      adaugaLinieComponenta();
+      const row = document.getElementById(`comp-row-${compRowCounter}`);
+      if (row) {
+        row.querySelector('.comp-tip').value = comp.tip;
+        row.querySelector('.comp-qty').value = comp.qty;
+      }
+    });
+  }
+  
   updateLiniiLED();
   
   const clientNameEl = document.getElementById('v2-client-name');
@@ -1216,6 +1260,19 @@ function generatePDF(i, skipReload = false) {
         if (row) {
           row.querySelector('.led-tip').value = led.tip;
           row.querySelector('.led-ml').value = led.ml;
+        }
+      });
+    }
+    
+    document.getElementById('extra-comps-container').innerHTML = '';
+    compRowCounter = 0;
+    if (q.state.extraComps && q.state.extraComps.length > 0) {
+      q.state.extraComps.forEach(comp => {
+        adaugaLinieComponenta();
+        const row = document.getElementById(`comp-row-${compRowCounter}`);
+        if (row) {
+          row.querySelector('.comp-tip').value = comp.tip;
+          row.querySelector('.comp-qty').value = comp.qty;
         }
       });
     }
@@ -1594,6 +1651,13 @@ function calculeazaV2() {
   let totalBaza = 0;
   let html = '';
   
+  const extraComps = Array.from(document.querySelectorAll('.extra-comp-row')).map(row => {
+    return {
+      tip: row.querySelector('.comp-tip').value,
+      qty: parseInt(row.querySelector('.comp-qty').value) || 0
+    };
+  });
+  
   // Cablare generala mp
   if (suprafata > 0) {
     let pret_mp = 50; 
@@ -1662,7 +1726,24 @@ function calculeazaV2() {
     }
   });
   
-  totalBaza += totalLedSub;
+  let extraCompsTotal = 0;
+  extraComps.forEach(comp => {
+    if (comp.qty > 0 && prices[comp.tip]) {
+      const linePrice = prices[comp.tip].price * comp.qty;
+      extraCompsTotal += linePrice;
+      html += `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 8px 4px;">${prices[comp.tip].name}</td>
+          <td style="padding: 8px 4px; color:var(--text3);">${prices[comp.tip].unit}</td>
+          <td style="padding: 8px 4px; text-align:center;">${comp.qty}</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(prices[comp.tip].price)} lei</td>
+          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(linePrice)} lei</td>
+        </tr>
+      `;
+    }
+  });
+  
+  totalBaza += totalLedSub + extraCompsTotal;
   
   const coefTotal = coefLucrare * coefPereti * coefAcces;
   let totalGeneral = totalBaza * coefTotal;
@@ -1722,6 +1803,9 @@ function resetCalculatorV2() {
   document.getElementById('led-rows-container').innerHTML = '';
   ledRowCounter = 0;
   if(document.getElementById('led-total-vizual')) document.getElementById('led-total-vizual').textContent = '0 lei';
+  
+  document.getElementById('extra-comps-container').innerHTML = '';
+  compRowCounter = 0;
   
   document.getElementById('v2-client-name').value = "";
   document.getElementById('v2-tabel-card').style.display = 'none';
