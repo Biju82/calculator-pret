@@ -640,7 +640,7 @@
       </div>
       
       <div class="price-row" style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; margin-bottom: 12px;">
-        <div class="price-row-name" style="color: var(--accent);">🏷️ Discount aplicat (%)</div>
+        <div class="price-row-name" style="color: var(--accent);">🏷️ Discount (%)</div>
         <input class="price-input" type="number" id="v2-discount" value="0" min="0" max="100">
       </div>
       
@@ -1224,7 +1224,7 @@ function generatePDF(i, skipReload = false) {
       ${ (parseFloat(q.state.discount) || 0) > 0 ? `
       <div style="text-align:right;">
         <div style="font-size:14px; color:#555; margin-bottom:5px;">Subtotal estimat manoperă: ${Math.round(parseInt(grandTotal.replace(/\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))).toLocaleString('ro-RO')} lei</div>
-        <div style="font-size:14px; color:#e74c3c; margin-bottom:10px;">Discount aplicat (${parseFloat(q.state.discount)}%): -${(Math.round(parseInt(grandTotal.replace(/\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))) - parseInt(grandTotal.replace(/\D/g, ''))).toLocaleString('ro-RO')} lei</div>
+        <div style="font-size:14px; color:#e74c3c; margin-bottom:10px;">Discount (${parseFloat(q.state.discount)}%): -${(Math.round(parseInt(grandTotal.replace(/\D/g, '')) / (1 - (parseFloat(q.state.discount)/100))) - parseInt(grandTotal.replace(/\D/g, ''))).toLocaleString('ro-RO')} lei</div>
         <h2 style="margin:0; color:#2c3e50;">TOTAL FINAL MANOPERĂ</h2>
         <h1 style="margin:10px 0 0 0; color:#e74c3c;">${grandTotal}</h1>
       </div>
@@ -1636,7 +1636,7 @@ function calculeazaV2() {
   if (discountPercent > 0) {
     breakdownHtml += `
     <div>
-      <div class="result-label" style="font-size:10px;">Discount aplicat (${discountPercent}%)</div>
+      <div class="result-label" style="font-size:10px;">Discount (${discountPercent}%)</div>
       <div style="font-size:16px; font-weight:700; color:var(--red);">-${Math.round(discountAmount).toLocaleString('ro-RO')} lei</div>
     </div>
     `;
