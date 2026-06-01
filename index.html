@@ -545,9 +545,14 @@
 <!-- ========== CALCULATOR ========== -->
 <div class="content">
 <div id="tab-calculator" class="section active">
+  <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+    <button class="btn btn-secondary" id="btn-v1" onclick="switchVersion('v1')" style="margin-top: 0; flex: 1; border-color: var(--accent); color: var(--accent);">V1.0 Simplu</button>
+    <button class="btn btn-secondary" id="btn-v2" onclick="switchVersion('v2')" style="margin-top: 0; flex: 1;">V2.0 Avansat (2026)</button>
+  </div>
 
-  <div class="section-header">Deviz nou</div>
-  <div class="section-sub">Completează parametrii lucrării</div>
+  <div id="calculator-v1">
+    <div class="section-header">Deviz nou</div>
+    <div class="section-sub">Completează parametrii lucrării</div>
 
   <!-- TIP LUCRARE -->
   <div class="card">
@@ -994,6 +999,121 @@
     </label>
   </div>
   <button class="btn btn-danger" onclick="resetCalc()">🔄 Deviz nou / Resetează</button>
+  </div> <!-- /calculator-v1 -->
+
+  <div id="calculator-v2" style="display: none;">
+    <div class="section-header">Deviz Avansat (2026)</div>
+    <div class="section-sub">Structură detaliată cu materiale și manoperă</div>
+
+    <!-- DATE INTRARE -->
+    <div class="card">
+      <div class="card-title"><div class="icon">📝</div> Parametri Generali</div>
+      <div class="input-row">
+        <div class="field">
+          <label class="label">Suprafață (mp)</label>
+          <input class="input" type="number" id="v2-suprafata" value="60" min="1">
+        </div>
+        <div class="field">
+          <label class="label">Regiune</label>
+          <select class="input" id="v2-regiune">
+            <option value="implicit">Implicit</option>
+            <option value="oras">Oraș mare (+15% manoperă)</option>
+            <option value="rural">Zonă rurală (-10% manoperă)</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="input-row" style="margin-top: 8px;">
+        <div class="check-item" style="border:none; padding: 0;">
+          <div class="check-left" style="gap: 6px;">
+            <div class="check-icon">✨</div>
+            <div class="check-name" style="font-size:12px;">Aparataj Premium (+30% materiale)</div>
+          </div>
+          <div class="check-right">
+             <button class="toggle off" id="v2-premium" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></button>
+          </div>
+        </div>
+        
+        <div class="check-item" style="border:none; padding: 0;">
+          <div class="check-left" style="gap: 6px;">
+            <div class="check-icon">🧱</div>
+            <div class="check-name" style="font-size:12px;">Spargere pereți (+40% manoperă)</div>
+          </div>
+          <div class="check-right">
+             <button class="toggle off" id="v2-spargere" onclick="this.classList.toggle('on'); this.classList.toggle('off');"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANTITATI -->
+    <div class="card">
+      <div class="card-title"><div class="icon">🔢</div> Componente instalație</div>
+      
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. puncte luminoase</div>
+        <input class="price-input" type="number" id="v2-puncte" value="5" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. prize simple</div>
+        <input class="price-input" type="number" id="v2-prize-simple" value="10" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. prize duble</div>
+        <input class="price-input" type="number" id="v2-prize-duble" value="4" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. întrerupătoare</div>
+        <input class="price-input" type="number" id="v2-intrerupatoare" value="6" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. circuite dedicate</div>
+        <input class="price-input" type="number" id="v2-circuite" value="2" min="0">
+      </div>
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name">Nr. tablouri principale</div>
+        <input class="price-input" type="number" id="v2-tablouri" value="1" min="0">
+      </div>
+      
+      <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-top: 16px;">🧮 Calculează Deviz</button>
+    </div>
+
+    <!-- REZULTAT V2 -->
+    <div class="result-panel" id="v2-rezultat-panel" style="display:none;">
+      <div class="result-label">Total General</div>
+      <div class="result-total" id="v2-total-general">0 lei</div>
+      
+      <div class="result-breakdown" style="margin-top: 12px; gap: 24px;">
+        <div>
+          <div class="result-label" style="font-size:10px;">Total Materiale</div>
+          <div style="font-size:16px; font-weight:700; color:var(--text);" id="v2-total-mat">0 lei</div>
+        </div>
+        <div>
+          <div class="result-label" style="font-size:10px;">Total Manoperă</div>
+          <div style="font-size:16px; font-weight:700; color:var(--text);" id="v2-total-man">0 lei</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- TABEL DEVIZ V2 -->
+    <div class="card" id="v2-tabel-card" style="display:none; overflow-x:auto;">
+      <div class="card-title"><div class="icon">📋</div> Deviz Detaliat</div>
+      <table style="width:100%; border-collapse: collapse; font-size:12px; min-width: 500px;" id="v2-tabel">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border); color:var(--text2); text-align:left;">
+            <th style="padding:8px 4px;">Articol</th>
+            <th style="padding:8px 4px;">U.M.</th>
+            <th style="padding:8px 4px; text-align:center;">Cant.</th>
+            <th style="padding:8px 4px; text-align:right;">Preț Mat.</th>
+            <th style="padding:8px 4px; text-align:right;">Preț Man.</th>
+            <th style="padding:8px 4px; text-align:right; color:var(--text);">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="v2-tabel-body">
+        </tbody>
+      </table>
+    </div>
+  </div> <!-- /calculator-v2 -->
 </div>
 
 <!-- ========== DEVIZE SALVATE ========== -->
@@ -1540,6 +1660,119 @@ function importJSON(event) {
   reader.readAsText(file);
   
   event.target.value = '';
+}
+
+// ====== V2 LOGIC ======
+
+let currentVersion = 'v1';
+
+function switchVersion(ver) {
+  currentVersion = ver;
+  document.getElementById('calculator-v1').style.display = ver === 'v1' ? 'block' : 'none';
+  document.getElementById('calculator-v2').style.display = ver === 'v2' ? 'block' : 'none';
+  
+  const btnV1 = document.getElementById('btn-v1');
+  const btnV2 = document.getElementById('btn-v2');
+  
+  if (ver === 'v1') {
+    btnV1.style.borderColor = 'var(--accent)';
+    btnV1.style.color = 'var(--accent)';
+    btnV2.style.borderColor = 'var(--border)';
+    btnV2.style.color = 'var(--text2)';
+  } else {
+    btnV2.style.borderColor = 'var(--accent)';
+    btnV2.style.color = 'var(--accent)';
+    btnV1.style.borderColor = 'var(--border)';
+    btnV1.style.color = 'var(--text2)';
+  }
+}
+
+const PRICING_DATA_V2 = {
+  items: [
+    { code: "POINT_LIGHT_SIMPLE", unit: "buc", description: "Punct lumină simplu", material_cost: 20, labor_cost: 80 },
+    { code: "SOCKET_SINGLE", unit: "buc", description: "Priză simplă", material_cost: 25, labor_cost: 70 },
+    { code: "SOCKET_DOUBLE", unit: "buc", description: "Priză dublă", material_cost: 35, labor_cost: 85 },
+    { code: "SWITCH_SINGLE", unit: "buc", description: "Întrerupător simplu", material_cost: 15, labor_cost: 60 },
+    { code: "CIRCUIT_DEDICATED", unit: "buc", description: "Circuit dedicat", material_cost: 150, labor_cost: 100 },
+    { code: "TABLOU_MAIN", unit: "buc", description: "Tablou principal", material_cost: 1000, labor_cost: 500 },
+    { code: "WIRING_GENERAL", unit: "mp", description: "Cablare electrică", material_cost: 20, labor_cost: 50 }
+  ]
+};
+
+function calculeazaV2() {
+  const suprafata = parseInt(document.getElementById('v2-suprafata').value) || 0;
+  const region = document.getElementById('v2-regiune').value;
+  const isPremium = document.getElementById('v2-premium').classList.contains('on');
+  const isSpargere = document.getElementById('v2-spargere').classList.contains('on');
+  
+  // Qty mapping
+  const qtys = {
+    "WIRING_GENERAL": suprafata,
+    "POINT_LIGHT_SIMPLE": parseInt(document.getElementById('v2-puncte').value) || 0,
+    "SOCKET_SINGLE": parseInt(document.getElementById('v2-prize-simple').value) || 0,
+    "SOCKET_DOUBLE": parseInt(document.getElementById('v2-prize-duble').value) || 0,
+    "SWITCH_SINGLE": parseInt(document.getElementById('v2-intrerupatoare').value) || 0,
+    "CIRCUIT_DEDICATED": parseInt(document.getElementById('v2-circuite').value) || 0,
+    "TABLOU_MAIN": parseInt(document.getElementById('v2-tablouri').value) || 0
+  };
+
+  // Multipliers
+  let laborMult = 1.0;
+  if (region === 'oras') laborMult += 0.15;
+  if (region === 'rural') laborMult -= 0.10;
+  
+  const laborCablareMult = isSpargere ? 1.40 : 1.0; // 40% in plus
+  const materialApparatajMult = isPremium ? 1.30 : 1.0; // 30% in plus
+  
+  let totalMat = 0;
+  let totalMan = 0;
+  let html = '';
+  
+  PRICING_DATA_V2.items.forEach(item => {
+    const q = qtys[item.code];
+    if (q > 0) {
+      let mat = item.material_cost;
+      let man = item.labor_cost;
+      
+      // Apply multipliers
+      if (['SOCKET_SINGLE', 'SOCKET_DOUBLE', 'SWITCH_SINGLE'].includes(item.code)) {
+        mat = mat * materialApparatajMult;
+      }
+      
+      if (item.code === 'WIRING_GENERAL' || item.code === 'CIRCUIT_DEDICATED') {
+        man = man * laborCablareMult;
+      }
+      
+      man = man * laborMult;
+      
+      // Calculate
+      const mCost = mat * q;
+      const lCost = man * q;
+      const sub = mCost + lCost;
+      
+      totalMat += mCost;
+      totalMan += lCost;
+      
+      html += `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 8px 4px;">${item.description}</td>
+          <td style="padding: 8px 4px; color:var(--text3);">${item.unit}</td>
+          <td style="padding: 8px 4px; text-align:center;">${q}</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(mat)} lei</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(man)} lei</td>
+          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(sub)} lei</td>
+        </tr>
+      `;
+    }
+  });
+  
+  document.getElementById('v2-tabel-body').innerHTML = html;
+  document.getElementById('v2-total-mat').textContent = Math.round(totalMat).toLocaleString('ro-RO') + ' lei';
+  document.getElementById('v2-total-man').textContent = Math.round(totalMan).toLocaleString('ro-RO') + ' lei';
+  document.getElementById('v2-total-general').textContent = Math.round(totalMat + totalMan).toLocaleString('ro-RO') + ' lei';
+  
+  document.getElementById('v2-tabel-card').style.display = 'block';
+  document.getElementById('v2-rezultat-panel').style.display = 'block';
 }
 
 // ====== START ======
