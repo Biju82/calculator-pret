@@ -617,6 +617,37 @@
         <div class="price-row-name">Nr. tablouri principale</div>
         <input class="price-input" type="number" id="v2-tablouri" value="1" min="0">
       </div>
+    </div>
+
+    <!-- MODUL LED -->
+    <div class="card">
+      <div class="card-title"><div class="icon">💡</div> Bandă LED (Manoperă/ml)</div>
+      
+      <div class="input-row">
+        <div class="field">
+          <label class="label">Metri liniari (ml)</label>
+          <input class="input" type="number" id="v2-led-ml" value="0" min="0">
+        </div>
+        <div class="field">
+          <label class="label">Tip Lucrare LED</label>
+          <select class="input" id="v2-led-tip">
+            <option value="32.5">Simplă (fără profil/smart) - BASIC</option>
+            <option value="55" selected>În profil / Canal - STANDARD</option>
+            <option value="100">RGB/Smart + controller - PREMIUM</option>
+            <option value="150">Scări/Tavane complexe - COMPLEX</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="field" style="margin-top:8px;">
+        <label class="label">Coeficient montaj LED</label>
+        <select class="input" id="v2-led-coef">
+          <option value="1.0">Tavan / Rigips (x1.0)</option>
+          <option value="1.1">Mobilier / Dressing (x1.1)</option>
+          <option value="1.25">Exterior IP (x1.25)</option>
+          <option value="1.4">Acces dificil scări / colțuri (x1.4)</option>
+        </select>
+      </div>
       
       <button class="btn btn-primary" onclick="calculeazaV2()" style="margin-top: 16px;">🧮 Calculează Deviz</button>
     </div>
@@ -1240,6 +1271,11 @@ function calculeazaV2() {
   const coefPereti = parseFloat(document.getElementById('v2-dificultate-pereti').value) || 1.0;
   const coefAcces = parseFloat(document.getElementById('v2-acces').value) || 1.0;
   
+  // LED
+  const ledMl = parseFloat(document.getElementById('v2-led-ml').value) || 0;
+  const ledTipPret = parseFloat(document.getElementById('v2-led-tip').value) || 55;
+  const ledCoef = parseFloat(document.getElementById('v2-led-coef').value) || 1.0;
+  
   // Qty mapping
   const qtys = {
     "WIRING_GENERAL": suprafata,
@@ -1272,6 +1308,23 @@ function calculeazaV2() {
       `;
     }
   });
+
+  // Procesare LED separat, apoi adaugat la subtotal general (intră ca 'Extra' in formula principală)
+  if (ledMl > 0) {
+    let manLed = ledTipPret * ledCoef;
+    let subLed = manLed * ledMl;
+    totalBaza += subLed;
+    
+    html += `
+        <tr style="border-bottom: 1px solid var(--border);">
+          <td style="padding: 8px 4px;">Montaj Bandă LED (Coef. x${ledCoef})</td>
+          <td style="padding: 8px 4px; color:var(--text3);">ml</td>
+          <td style="padding: 8px 4px; text-align:center;">${ledMl}</td>
+          <td style="padding: 8px 4px; text-align:right;">${Math.round(manLed)} lei</td>
+          <td style="padding: 8px 4px; text-align:right; font-weight:600; color:var(--text);">${Math.round(subLed)} lei</td>
+        </tr>
+      `;
+  }
   
   const coefTotal = coefLucrare * coefPereti * coefAcces;
   const totalGeneral = totalBaza * coefTotal;
