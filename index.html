@@ -588,7 +588,7 @@
         </div>
         <div class="field">
           <label class="label">Suprafață (mp)</label>
-          <input class="input" type="number" id="v2-suprafata" value="60" min="1">
+          <input class="input" type="number" id="v2-suprafata" value="60" min="1" oninput="const ro=document.getElementById('v2-cablare-ro'); if(ro) ro.value = this.value; if(typeof calculeazaV2 === 'function') calculeazaV2();">
         </div>
       </div>
     </div>
@@ -597,6 +597,10 @@
     <div class="card">
       <div class="card-title"><div class="icon">🔢</div> Componente instalație</div>
       
+      <div class="price-row" style="padding: 6px 0;">
+        <div class="price-row-name" style="color: var(--text3);">Cablare generală (mp) <span style="font-size:10px; font-weight:normal;">*inclusă automat</span></div>
+        <input class="price-input" type="number" id="v2-cablare-ro" value="60" disabled style="background-color: transparent; border: 1px dashed var(--border); color: var(--text3);">
+      </div>
       <div class="price-row" style="padding: 6px 0;">
         <div class="price-row-name">Nr. puncte luminoase</div>
         <input class="price-input" type="number" id="v2-puncte" value="0" min="0">
@@ -1103,6 +1107,8 @@ function loadQuote(i) {
   document.getElementById('v2-dificultate-pereti').value = q.state.dificultatePereti || '1.0';
   document.getElementById('v2-acces').value = q.state.acces || '1.0';
   document.getElementById('v2-suprafata').value = q.state.suprafata || '0';
+  const cablareRoEl = document.getElementById('v2-cablare-ro');
+  if(cablareRoEl) cablareRoEl.value = q.state.suprafata || '0';
   document.getElementById('v2-discount').value = q.state.discount || '0';
   
   if (q.state.qtys) {
@@ -1193,6 +1199,8 @@ function generatePDF(i, skipReload = false) {
     document.getElementById('v2-dificultate-pereti').value = q.state.dificultatePereti || '1.0';
     document.getElementById('v2-acces').value = q.state.acces || '1.0';
     document.getElementById('v2-suprafata').value = q.state.suprafata || '0';
+    const cablareRoEl = document.getElementById('v2-cablare-ro');
+    if(cablareRoEl) cablareRoEl.value = q.state.suprafata || '0';
     document.getElementById('v2-discount').value = q.state.discount || '0';
     
     if (q.state.qtys) {
@@ -1762,6 +1770,8 @@ function resetCalculatorV2() {
   document.getElementById('v2-dificultate-pereti').value = "1.0";
   document.getElementById('v2-acces').value = "1.0";
   document.getElementById('v2-suprafata').value = "0";
+  const cablareRoEl2 = document.getElementById('v2-cablare-ro');
+  if(cablareRoEl2) cablareRoEl2.value = "0";
   document.getElementById('v2-discount').value = "0";
   
   document.getElementById('v2-puncte').value = "0";
