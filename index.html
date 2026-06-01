@@ -1870,9 +1870,22 @@ function adaugaLinieComponenta() {
   const id = compRowCounter;
   
   let options = '';
-  Object.keys(prices).forEach(key => {
-    if (!key.startsWith('il_led_')) {
-      options += `<option value="${key}">${prices[key].name} (${prices[key].unit}) - ${prices[key].price} lei</option>`;
+  const groupNames = {
+    iluminat: 'Iluminat & Bandă LED',
+    tablou: 'Tablou Electric',
+    circuite_v2: 'Circuite Generale',
+    low_current: 'Curenți Slabi / Date'
+  };
+
+  Object.entries(PRICE_GROUPS).forEach(([group, keys]) => {
+    let groupOptions = '';
+    keys.forEach(key => {
+      if (!key.startsWith('il_led_') && prices[key]) {
+        groupOptions += `<option value="${key}">${prices[key].name} (${prices[key].unit}) - ${prices[key].price} lei</option>`;
+      }
+    });
+    if (groupOptions) {
+      options += `<optgroup label="${groupNames[group] || group}">${groupOptions}</optgroup>`;
     }
   });
 
