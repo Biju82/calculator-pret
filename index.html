@@ -524,6 +524,99 @@
     .card-title .icon { background: transparent !important; border: 1px solid #ccc !important; }
     .profit-bar { background: transparent !important; border: 1px solid #ccc !important; }
   }
+  /* DONATIONS */
+  .donations-footer {
+    margin-top: 32px;
+    padding: 24px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    text-align: center;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .donations-footer h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    margin: 0 0 8px 0;
+    color: var(--text);
+  }
+  .donations-footer p {
+    font-size: 12px;
+    color: var(--text2);
+    margin: 0 0 16px 0;
+  }
+  .donation-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-donate {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .btn-donate:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+  }
+  .btn-revolut {
+    background: #0075eb;
+    color: #fff;
+  }
+  .btn-wise {
+    background: #9fe870;
+    color: #163300;
+  }
+  .floating-donate {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 10px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    z-index: 1000;
+    font-weight: 600;
+    color: var(--text);
+    transition: transform 0.2s;
+    font-family: inherit;
+  }
+  .floating-donate:hover {
+    transform: translateY(-2px);
+  }
+  .donate-popup {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .donate-popup.active {
+    display: flex;
+    animation: slideUp 0.2s ease-out;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
@@ -797,7 +890,36 @@
   </div>
 </div>
 
+  <div class="donations-footer">
+    <h3>Susține proiectul</h3>
+    <p>Dacă aplicația ți-a fost utilă, poți susține dezvoltarea ei printr-o donație.</p>
+    <div class="donation-buttons">
+      <a href="https://revolut.me/biju22" target="_blank" class="btn-donate btn-revolut">💙 Donează cu Revolut</a>
+      <a href="https://wise.com/pay/me/dabijaa" target="_blank" class="btn-donate btn-wise">💚 Donează cu Wise</a>
+    </div>
+  </div>
+
 </div><!-- end content -->
+
+<button class="floating-donate" onclick="toggleDonatePopup()">💙 Donează</button>
+<div class="donate-popup" id="donate-popup">
+  <a href="https://revolut.me/biju22" target="_blank" class="btn-donate btn-revolut">💙 Donează cu Revolut</a>
+  <a href="https://wise.com/pay/me/dabijaa" target="_blank" class="btn-donate btn-wise">💚 Donează cu Wise</a>
+</div>
+
+<script>
+function toggleDonatePopup() {
+  const popup = document.getElementById('donate-popup');
+  popup.classList.toggle('active');
+}
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('donate-popup');
+  const btn = document.querySelector('.floating-donate');
+  if (popup && popup.classList.contains('active') && !popup.contains(e.target) && !btn.contains(e.target)) {
+    popup.classList.remove('active');
+  }
+});
+</script>
 
 <div class="toast" id="toast">✓ Salvat cu succes!</div>
 
