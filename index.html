@@ -691,20 +691,20 @@
   </div>
 
   <div class="card">
-    <div class="card-title"><div class="icon">⚡</div> Instalație de bază</div>
-    <div id="price-editor-base"></div>
+    <div class="card-title"><div class="icon">🔌</div> Iluminat & Bandă LED</div>
+    <div id="price-editor-iluminat"></div>
   </div>
   <div class="card">
-    <div class="card-title"><div class="icon">🔧</div> Circuite dedicate</div>
-    <div id="price-editor-circuite"></div>
+    <div class="card-title"><div class="icon">⚡</div> Tablou Electric</div>
+    <div id="price-editor-tablou"></div>
   </div>
   <div class="card">
-    <div class="card-title"><div class="icon">💡</div> Benzi LED (Manoperă)</div>
-    <div id="price-editor-led"></div>
+    <div class="card-title"><div class="icon">🔧</div> Circuite Generale</div>
+    <div id="price-editor-circuite_v2"></div>
   </div>
   <div class="card">
-    <div class="card-title"><div class="icon">🛡️</div> Servicii & verificări</div>
-    <div id="price-editor-servicii"></div>
+    <div class="card-title"><div class="icon">🌐</div> Curenți Slabi / Date</div>
+    <div id="price-editor-low_current"></div>
   </div>
 
   <button class="btn btn-primary" onclick="savePrices()">✅ Salvează prețuri curente</button>
@@ -797,18 +797,36 @@ const DEFAULT_PRICES = {
   'camera': { name: 'Cameră supraveghere (cablaj+montaj)', unit: 'buc', price: 100, hasQty: true },
   'retea-date': { name: 'Punct rețea date / internet', unit: 'buc', price: 80, hasQty: true },
   'deplasare': { name: 'Deplasare / transport', unit: 'set', price: 100, hasQty: false },
-  // led
-  'il_led_basic': { name: 'Bandă LED BASIC', unit: 'ml', price: 32.5, hasQty: true },
-  'il_led_std': { name: 'Bandă LED STANDARD', unit: 'ml', price: 55, hasQty: true },
-  'il_led_prem': { name: 'Bandă LED PREMIUM', unit: 'ml', price: 100, hasQty: true },
-  'il_led_cx': { name: 'Bandă LED COMPLEX', unit: 'ml', price: 150, hasQty: true }
+  // iluminat
+  'il_gen': { name: 'Circuit iluminat general', unit: 'circuit', price: 150 },
+  'il_led_basic': { name: 'Bandă LED BASIC', unit: 'ml', price: 32.5 },
+  'il_led_std': { name: 'Bandă LED STANDARD', unit: 'ml', price: 55 },
+  'il_led_prem': { name: 'Bandă LED PREMIUM', unit: 'ml', price: 100 },
+  'il_led_cx': { name: 'Bandă LED COMPLEX', unit: 'ml', price: 150 },
+  // tablou
+  'tb_mcb': { name: 'Siguranță automată (MCB)', unit: 'buc', price: 35 },
+  'tb_rcd': { name: 'Diferențială (RCD)', unit: 'buc', price: 130 },
+  'tb_reorg': { name: 'Reorganizare tablou existent', unit: 'set', price: 400 },
+  'tb_eticheta': { name: 'Etichetare circuite', unit: 'tablou', price: 85 },
+  // circuite v2
+  'circ_prize': { name: 'Circuit prize general', unit: 'circuit', price: 150 },
+  'circ_iluminat': { name: 'Circuit iluminat general', unit: 'circuit', price: 125 },
+  'circ_bucatarie': { name: 'Circuit bucătărie general', unit: 'circuit', price: 200 },
+  'pct_priza_s': { name: 'Punct priză simplă', unit: 'buc', price: 70 },
+  'pct_priza_d': { name: 'Punct priză dublă', unit: 'buc', price: 85 },
+  'pct_intrerup': { name: 'Punct întrerupător', unit: 'buc', price: 60 },
+  // low current
+  'lc_tv': { name: 'Cablu TV coaxial', unit: 'punct', price: 80 },
+  'lc_rj45': { name: 'Cablu rețea RJ45', unit: 'punct', price: 95 },
+  'lc_interfon': { name: 'Interfon / sonerie', unit: 'punct', price: 115 },
+  'lc_smart': { name: 'Pregătire smart home', unit: 'punct', price: 150 }
 };
 
 const PRICE_GROUPS = {
-  base: ['tablou','cablare-mp','prize','prize-duble','intrerupatoare','comutatoare','corpuri-iluminat','spotturi'],
-  circuite: ['plita','cuptor','boiler','masina-spalat','aer-conditionat','pompa-caldura','incarcator-ev'],
-  led: ['il_led_basic', 'il_led_std', 'il_led_prem', 'il_led_cx'],
-  servicii: ['impamantare','verificare-pram','proiect','paratrasnet','videointerfon','alarma','camera','retea-date','deplasare']
+  iluminat: ['il_gen','il_led_basic','il_led_std','il_led_prem','il_led_cx'],
+  tablou: ['tb_mcb','tb_rcd','tb_reorg','tb_eticheta'],
+  circuite_v2: ['circ_prize','circ_iluminat','circ_bucatarie','pct_priza_s','pct_priza_d','pct_intrerup'],
+  low_current: ['lc_tv','lc_rj45','lc_interfon','lc_smart']
 };
 
 let prices = {};
@@ -836,11 +854,13 @@ function init() {
     if (el) toggleState[k] = el.classList.contains('on');
   });
 
-  // Sincronizare preturi LED in BUILDER_DATA
-  BUILDER_DATA.iluminat.forEach(item => {
-    if (prices[item.id]) {
-      item.price = prices[item.id].price;
-    }
+  // Sincronizare preturi in BUILDER_DATA
+  Object.keys(BUILDER_DATA).forEach(cat => {
+    BUILDER_DATA[cat].forEach(item => {
+      if (prices[item.id]) {
+        item.price = prices[item.id].price;
+      }
+    });
   });
 
   buildPriceEditor();
