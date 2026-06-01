@@ -642,7 +642,10 @@
       
       <div style="border-top:1px solid var(--border); padding-top:16px; margin-bottom: 24px;">
         <input type="text" id="v2-client-name" class="input" placeholder="Nume client / proiect (opțional)" style="margin-bottom:8px;">
-        <button class="btn btn-secondary" onclick="saveQuoteV2()" style="width:100%; height:44px; font-size:14px; border-color: var(--accent); color: var(--accent);">💾 Salvează Deviz</button>
+        <div style="display:flex; gap: 8px;">
+          <button class="btn btn-secondary" onclick="saveQuoteV2()" style="flex:2; height:44px; font-size:14px; border-color: var(--accent); color: var(--accent);">💾 Salvează Deviz</button>
+          <button class="btn btn-secondary" onclick="resetCalculatorV2()" style="flex:1; height:44px; font-size:14px;">🔄 Reset</button>
+        </div>
       </div>
     </div>
 
@@ -1488,6 +1491,30 @@ function calculeazaV2() {
   
   document.getElementById('v2-tabel-card').style.display = 'block';
   document.getElementById('v2-rezultat-panel').style.display = 'block';
+}
+
+function resetCalculatorV2() {
+  document.getElementById('v2-tip-lucrare').value = "1.0";
+  document.getElementById('v2-dificultate-pereti').value = "1.0";
+  document.getElementById('v2-acces').value = "1.0";
+  document.getElementById('v2-suprafata').value = "0";
+  
+  document.getElementById('v2-puncte').value = "0";
+  document.getElementById('v2-prize-simple').value = "0";
+  document.getElementById('v2-prize-duble').value = "0";
+  document.getElementById('v2-intrerupatoare').value = "0";
+  document.getElementById('v2-circuite').value = "0";
+  document.getElementById('v2-tablouri').value = "0";
+  
+  document.getElementById('led-rows-container').innerHTML = '';
+  ledRowCounter = 0;
+  if(document.getElementById('led-total-vizual')) document.getElementById('led-total-vizual').textContent = '0 lei';
+  
+  document.getElementById('v2-client-name').value = "";
+  document.getElementById('v2-tabel-card').style.display = 'none';
+  document.getElementById('v2-rezultat-panel').style.display = 'none';
+  
+  showToast('🔄 Calculator resetat');
 }
 
 // ====== LOGICA LED ======
